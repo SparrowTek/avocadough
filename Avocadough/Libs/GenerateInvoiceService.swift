@@ -31,7 +31,7 @@ struct GenerateInvoiceService {
     }
     
     private func buildRequest(lightningAddress: String, amount: String, comment: String?) async throws -> URLRequest {
-        guard var urlComponents = URLComponents(string: "https://dsivu5l6kg4vsyjwdisypik4bq0dtzns.lambda-url.us-east-1.on.aws") else { throw GenerateInvoiceError.badURLComponent }
+        guard var urlComponents = URLComponents(string: "https://lightning-address-details-proxy.avocadough.xyz") else { throw GenerateInvoiceError.badURLComponent }
         urlComponents.queryItems = [
             URLQueryItem(name: "ln", value: lightningAddress),
             URLQueryItem(name: "amount", value: amount),
