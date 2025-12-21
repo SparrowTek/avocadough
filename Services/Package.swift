@@ -16,7 +16,6 @@ let package = Package(
         .package(url: "https://github.com/awslabs/swift-aws-lambda-runtime", from: "2.4.0"),
         .package(url: "https://github.com/awslabs/swift-aws-lambda-events", from: "1.4.0"),
         .package(url: "https://github.com/swift-server/async-http-client", from: "1.30.1"),
-        .package(url: "https://github.com/swift-cloud/Compute", branch: "main"),
     ],
     targets: [
         .executableTarget(
