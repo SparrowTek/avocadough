@@ -6,104 +6,205 @@
 //
 
 import SwiftUI
-@preconcurrency import NostrSDK
-import LightningDevKit
+import NostrKit
+import CoreNostr
 import Vault
 
 enum NWCError: Error {
-    case publicKey
     case noSecret
-    case failedToCreateNWCSecretKey
-    case failedToCreateNWCUri
     case failedToSaveSecret
-    case noNwc
+    case notConnected
     case failedToParse
-    case nostrSDK(Error)
+    case nostrKit(Error)
+}
+
+/// Custom response type to maintain API compatibility with existing code.
+/// NostrKit's makeInvoice returns only the invoice string, but callers expect
+/// both invoice and paymentHash.
+struct MakeInvoiceResponse: Sendable, Hashable {
+    let invoice: String
+    let paymentHash: String
 }
 
 @Observable
 @MainActor
 class NWC {
-    private var nwc: Nwc?
+    private let walletManager = WalletConnectManager()
+    private var storedUri: String?
     var hasConnected = false
-    
-    func parseWalletCode(_ code: String) throws (NWCError) -> NWCConnection {
-        guard let parsedCode = try? NostrWalletConnectUri.parse(uri: code) else { throw .failedToParse }
-        try saveSecret(parsedCode.secret().toHex())
-        return NWCConnection(pubKey: parsedCode.publicKey().toHex(), relay: parsedCode.relayUrl(), lud16: parsedCode.lud16())
+
+    /// Parse NWC URI and save secret to keychain
+    /// - Parameter code: The nostr+walletconnect:// URI string
+    /// - Returns: NWCConnection with pubKey, relay, and optional lud16
+    func parseWalletCode(_ code: String) throws(NWCError) -> NWCConnection {
+        guard let uri = NWCConnectionURI(from: code) else {
+            throw .failedToParse
+        }
+
+        // Save the secret to keychain
+        try saveSecret(uri.secret)
+
+        // Store the full URI for later connection
+        storedUri = code
+
+        // Return first relay (NWC typically uses single relay)
+        let relay = uri.relays.first ?? ""
+
+        return NWCConnection(
+            pubKey: uri.walletPubkey,
+            relay: relay,
+            lud16: uri.lud16
+        )
     }
-    
-    func initializeNWCClient(pubKey: String, relay: String, lud16: String?) throws (NWCError) {
-        guard let publicKey = try? PublicKey.parse(publicKey: pubKey) else { throw .publicKey }
+
+    /// Initialize and connect the NWC client
+    /// - Parameters:
+    ///   - pubKey: The wallet's public key (hex string)
+    ///   - relay: The relay URL
+    ///   - lud16: Optional lightning address
+    func initializeNWCClient(pubKey: String, relay: String, lud16: String?) async throws(NWCError) {
         guard let secret else { throw .noSecret }
-        guard let secretKey = try? SecretKey.parse(secretKey: secret) else { throw .failedToCreateNWCSecretKey }
-        guard let nwcUri = try? NostrWalletConnectUri(publicKey: publicKey, relayUrl: relay, randomSecretKey: secretKey, lud16: lud16) else { throw .failedToCreateNWCUri }
-        nwc = Nwc(uri: nwcUri)
-        hasConnected = true
-    }
-    
-    func getInfo() async throws (NWCError) -> GetInfoResponse {
-        guard let nwc else { throw .noNwc }
+
+        // Reconstruct URI from components if we don't have it stored
+        let uri = storedUri ?? buildUri(pubKey: pubKey, relay: relay, secret: secret, lud16: lud16)
+
         do {
-            return try await nwc.getInfo()
+            try await walletManager.connect(uri: uri)
+            hasConnected = true
         } catch {
-            throw .nostrSDK(error)
+            throw .nostrKit(error)
         }
     }
-    
-    func getBalance() async throws (NWCError) -> UInt64 {
-        guard let nwc else { throw .noNwc }
+
+    /// Get wallet information
+    /// - Returns: WalletInfo containing alias, network, methods, etc.
+    func getInfo() async throws(NWCError) -> WalletConnectManager.WalletInfo {
         do {
-            return try await nwc.getBalance()
+            return try await walletManager.getInfo()
         } catch {
-            throw .nostrSDK(error)
+            throw .nostrKit(error)
         }
     }
-    
+
+    /// Get wallet balance in millisatoshis
+    /// - Returns: Balance as UInt64 (converted from NostrKit's Int64)
+    func getBalance() async throws(NWCError) -> UInt64 {
+        do {
+            let balance = try await walletManager.getBalance()
+            return UInt64(max(0, balance))
+        } catch {
+            throw .nostrKit(error)
+        }
+    }
+
+    /// Pay a BOLT11 invoice
+    /// - Parameter invoice: The BOLT11 invoice string
+    /// - Returns: PaymentResult with preimage and fees
     @discardableResult
-    func payInvoice(_ invoice: Bolt11Invoice) async throws (NWCError) -> PayInvoiceResponse {
-        guard let nwc else { throw .noNwc }
+    func payInvoice(_ invoice: String) async throws(NWCError) -> WalletConnectManager.PaymentResult {
         do {
-            let payInvoiceRequest = PayInvoiceRequest(id: nil, invoice: invoice.toStr(), amount: invoice.amountMilliSatoshis())
-            return try await nwc.payInvoice(params: payInvoiceRequest)
+            return try await walletManager.payInvoice(invoice)
         } catch {
-            throw .nostrSDK(error)
+            throw .nostrKit(error)
         }
     }
-        
-    func makeInvoice(amount: UInt64, description: String?, descriptionHash: String?, expiry: UInt64?) async throws (NWCError) -> MakeInvoiceResponse {
-        guard let nwc else { throw .noNwc }
-        
+
+    /// Create a new invoice
+    /// - Parameters:
+    ///   - amount: Amount in millisatoshis
+    ///   - description: Optional invoice description
+    ///   - descriptionHash: Optional description hash (not supported by NostrKit - ignored)
+    ///   - expiry: Optional expiry in seconds
+    /// - Returns: MakeInvoiceResponse with invoice and payment hash
+    func makeInvoice(
+        amount: UInt64,
+        description: String?,
+        descriptionHash: String?,
+        expiry: UInt64?
+    ) async throws(NWCError) -> MakeInvoiceResponse {
         do {
-            let makeInvoiceParams = MakeInvoiceRequest(amount: amount, description: description, descriptionHash: descriptionHash, expiry: expiry)
-            return try await nwc.makeInvoice(params: makeInvoiceParams)
+            let invoice = try await walletManager.makeInvoice(
+                amount: Int64(amount),
+                description: description,
+                expiry: expiry.map { Int($0) }
+            )
+
+            // Look up the invoice to get the payment hash
+            let lookupResult = try await walletManager.lookupInvoice(invoice: invoice)
+
+            return MakeInvoiceResponse(
+                invoice: invoice,
+                paymentHash: lookupResult.paymentHash
+            )
         } catch {
-            throw .nostrSDK(error)
+            throw .nostrKit(error)
         }
     }
-    
-    func listTransactions(from: Timestamp?, until: Timestamp?, limit: UInt64?, offset: UInt64?, unpaid: Bool?, transactionType: TransactionType?) async throws (NWCError) -> [LookupInvoiceResponse] {
-        guard let nwc else { throw .noNwc }
-        
+
+    /// List transactions
+    /// - Parameters:
+    ///   - from: Start date
+    ///   - until: End date
+    ///   - limit: Maximum number of transactions
+    ///   - offset: Pagination offset (not supported by NostrKit - ignored)
+    ///   - unpaid: Filter by unpaid status (not supported by NostrKit - ignored)
+    ///   - transactionType: Filter by type (not supported by NostrKit - ignored)
+    /// - Returns: Array of NWCTransaction
+    func listTransactions(
+        from: Date?,
+        until: Date?,
+        limit: UInt64?,
+        offset: UInt64?,
+        unpaid: Bool?,
+        transactionType: NWCTransactionType?
+    ) async throws(NWCError) -> [NWCTransaction] {
         do {
-            let listTransactionsParams = ListTransactionsRequest(from: from, until: until, limit: limit, offset: offset, unpaid: unpaid, transactionType: transactionType)
-            return try await nwc.listTransactions(params: listTransactionsParams)
+            return try await walletManager.listTransactions(
+                from: from,
+                until: until,
+                limit: limit.map { Int($0) }
+            )
         } catch {
-            throw .nostrSDK(error)
+            throw .nostrKit(error)
         }
     }
-    
-    // MARK: Secret
-    private var secret: String? { try? Vault.getPrivateKey(keychainConfiguration: .nwcSecret) }
-    
-    private func saveSecret(_ secret: String) throws (NWCError) {
+
+    // MARK: - Secret Management
+
+    private var secret: String? {
+        try? Vault.getPrivateKey(keychainConfiguration: .nwcSecret)
+    }
+
+    private func saveSecret(_ secret: String) throws(NWCError) {
         do {
             try Vault.savePrivateKey(secret, keychainConfiguration: .nwcSecret)
         } catch {
             throw .failedToSaveSecret
         }
     }
+
+    // MARK: - Helpers
+
+    private func buildUri(pubKey: String, relay: String, secret: String, lud16: String?) -> String {
+        var components = URLComponents()
+        components.scheme = "nostr+walletconnect"
+        components.host = pubKey
+
+        var queryItems = [
+            URLQueryItem(name: "relay", value: relay),
+            URLQueryItem(name: "secret", value: secret)
+        ]
+
+        if let lud16 {
+            queryItems.append(URLQueryItem(name: "lud16", value: lud16))
+        }
+
+        components.queryItems = queryItems
+        return components.string ?? "nostr+walletconnect://\(pubKey)?relay=\(relay)&secret=\(secret)"
+    }
 }
+
+// MARK: - Environment Integration
 
 @MainActor
 private struct NWCKey: @preconcurrency EnvironmentKey {

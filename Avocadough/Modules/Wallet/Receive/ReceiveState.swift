@@ -7,7 +7,6 @@
 
 import Foundation
 import SwiftUI
-import NostrSDK
 
 @Observable
 @MainActor
@@ -16,21 +15,21 @@ class ReceiveState {
         case createInvoice
         case displayInvoice(MakeInvoiceResponse)
     }
-    
+
     private unowned let parentState: WalletState
-    
+
     var path: [ReceiveState.NavigationLink] = []
     var errorMessage: LocalizedStringKey?
-    
+
     init(parentState: WalletState) {
         self.parentState = parentState
     }
-    
+
     func doneTapped() {
         parentState.closeSheet()
         path = []
     }
-    
+
     func refreshTransactions() {
         parentState.refresh()
     }

@@ -7,7 +7,7 @@
 
 import SwiftUI
 import Vault
-import NostrSDK
+import NostrKit
 
 @Observable
 @MainActor
@@ -55,7 +55,7 @@ public class AppState {
         route = .wallet
     }
     
-    func saveInfo(_ info: GetInfoResponse) {
+    func saveInfo(_ info: WalletConnectManager.WalletInfo) {
         configSuccessful()
     }
     

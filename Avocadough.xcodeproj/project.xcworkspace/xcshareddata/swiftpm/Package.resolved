@@ -1,5 +1,5 @@
 {
-  "originHash" : "1ab7c52cfbfeb40a9e50796a990eebdb8fe5363e60d97329fcfb698b0c4ebd5e",
+  "originHash" : "3c88fc3409164ab67b5dae17c7c5f1002187d88a1d9e5ff33709858430162dac",
   "pins" : [
     {
       "identity" : "async-http-client",
@@ -29,6 +29,15 @@
       }
     },
     {
+      "identity" : "corenostr",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/SparrowTek/CoreNostr.git",
+      "state" : {
+        "branch" : "main",
+        "revision" : "fc9d029c9a4379018abd552cd5559b158d397a9c"
+      }
+    },
+    {
       "identity" : "jmespath.swift",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/jmespath/jmespath.swift.git",
@@ -47,12 +56,12 @@
       }
     },
     {
-      "identity" : "nostr-sdk-swift",
+      "identity" : "nostrkit",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/rust-nostr/nostr-sdk-swift",
+      "location" : "https://github.com/SparrowTek/NostrKit",
       "state" : {
-        "revision" : "bc45e5ee6b563b0c365c263dfa0e3ad404d6ff6c",
-        "version" : "0.39.0"
+        "branch" : "main",
+        "revision" : "7becf245e21ac81225eb28980f2346e6e2a30d00"
       }
     },
     {
@@ -269,6 +278,15 @@
       "state" : {
         "revision" : "0c0290ff6b24942dadb83a929ffaaa1481df04a2",
         "version" : "1.1.1"
+      }
+    },
+    {
+      "identity" : "swift-secp256k1",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/21-DOT-DEV/swift-secp256k1",
+      "state" : {
+        "revision" : "8c62aba8a3011c9bcea232e5ee007fb0b34a15e2",
+        "version" : "0.21.1"
       }
     },
     {

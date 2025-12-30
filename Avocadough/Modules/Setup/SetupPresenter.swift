@@ -132,9 +132,17 @@ fileprivate struct SetupView: View {
             let nwcCode = try nwc.parseWalletCode(code)
             context.insert(nwcCode)
             try context.save()
-            try nwc.initializeNWCClient(pubKey: nwcCode.pubKey, relay: nwcCode.relay, lud16: nwcCode.lud16)
+
+            // initializeNWCClient is async - wrap in Task
+            Task {
+                do {
+                    try await nwc.initializeNWCClient(pubKey: nwcCode.pubKey, relay: nwcCode.relay, lud16: nwcCode.lud16)
+                } catch {
+                    state.errorMessage = "failed to initialize NWC wallet connection"
+                }
+            }
         } catch {
-            state.errorMessage = "failed to initzilize NWC wallet connection"
+            state.errorMessage = "failed to initialize NWC wallet connection"
         }
     }
     

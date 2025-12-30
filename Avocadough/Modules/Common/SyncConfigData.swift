@@ -7,7 +7,7 @@
 
 import SwiftUI
 import SwiftData
-import NostrSDK
+import NostrKit
 
 fileprivate struct SyncConfigData: ViewModifier {
     @Environment(AppState.self) private var state
@@ -15,17 +15,17 @@ fileprivate struct SyncConfigData: ViewModifier {
     @Environment(\.modelContext) private var context
     @Query private var nwcCodes: [NWCConnection]
     @Query private var wallets: [Wallet]
-    
+
     func body(content: Content) -> some View {
         content
             .task { await getWalletInfo() }
             .task { await getBTCPrice(content.isCanvas) }
     }
-    
+
     private func getWalletInfo() async {
         do {
             if let nwcCode = nwcCodes.first {
-                try nwc.initializeNWCClient(pubKey: nwcCode.pubKey, relay: nwcCode.relay, lud16: nwcCode.lud16)
+                try await nwc.initializeNWCClient(pubKey: nwcCode.pubKey, relay: nwcCode.relay, lud16: nwcCode.lud16)
             } else {
                 state.logout()
                 return
@@ -35,11 +35,11 @@ fileprivate struct SyncConfigData: ViewModifier {
                 context.delete(nwcCode)
                 try? context.save()
             }
-            
+
             state.logout()
             return
         }
-        
+
         do {
             let info = try await nwc.getInfo()
             let balance = try await nwc.getBalance()
@@ -53,20 +53,20 @@ fileprivate struct SyncConfigData: ViewModifier {
             }
         }
     }
-    
-    private func saveWallet(info: GetInfoResponse, balance: UInt64) throws {
+
+    private func saveWallet(info: WalletConnectManager.WalletInfo, balance: UInt64) throws {
         let wallet = Wallet(info: info, balance: balance)
         context.insert(wallet)
         try context.save()
     }
-    
+
     private func getBTCPrice(_ isCanvas: Bool) async {
         let price = if isCanvas {
             BTCPrice(amount: "83939.07", lastUpdatedAtInUtcEpochSeconds: "1744395173", currency: "USD", version: "1", base: "BTC")
         } else {
             try? await BlockBTCPriceService().getCurrentPrice()
         }
-        
+
         state.savePrice(price)
     }
 }

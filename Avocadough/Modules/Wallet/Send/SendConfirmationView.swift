@@ -52,7 +52,7 @@ struct SendConfirmationView: View {
         requestInProgress = true
         
         do {
-            try await nwc.payInvoice(bolt11)
+            try await nwc.payInvoice(bolt11.toStr())
         } catch {
             errorMessage = "There was a problem confirming your payment. Please try again later"
         }
