@@ -15,10 +15,6 @@ struct SettingsPresenter: View {
         
         NavigationStack(path: $state.path) {
             SettingsView()
-                .confirmationDialog("logout?", isPresented: $state.presentNWCDisconnectDialog) {
-                    Button("logout", role: .destructive, action: disconnectNWC)
-                    Button("cancel", role: .cancel, action: {})
-                }
                 .navigationDestination(for: SettingsState.NavigationLink.self) {
                     switch $0 {
                     case .privacy:
@@ -38,10 +34,6 @@ struct SettingsPresenter: View {
         }
         
     }
-    
-    private func disconnectNWC() {
-        state.disconnectNWC()
-    }
 }
 
 struct SettingsView: View {
@@ -54,6 +46,8 @@ struct SettingsView: View {
     
     // add link for value 4 value to support development
     var body: some View {
+        @Bindable var state = state
+        
         Form {
             Section {
                 
@@ -93,6 +87,9 @@ struct SettingsView: View {
             
             Button("disconnect and clear all data", systemImage: "bolt.trianglebadge.exclamationmark.fill", role: .destructive, action: disconnectFromNWCAlert)
                 .foregroundStyle(.red)
+                .confirmationDialog("logout?", isPresented: $state.presentNWCDisconnectDialog) {
+                    Button("logout", role: .destructive, action: disconnectNWC)
+                }
         }
         .fullScreenColorView()
         .navigationTitle("settings")
@@ -105,6 +102,10 @@ struct SettingsView: View {
         // MARK: color scheme modifiers
         .onAppear(perform: setSelectedColorScheme)
         .onChange(of: selectedColorScheme, updateColorScheme)
+    }
+    
+    private func disconnectNWC() {
+        state.disconnectNWC()
     }
     
     private func disconnectFromNWCAlert() {
