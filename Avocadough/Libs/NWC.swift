@@ -32,6 +32,11 @@ class NWC {
     private let walletManager = WalletConnectManager()
     private var storedUri: String?
     var hasConnected = false
+    
+    func logout() {
+        hasConnected = false
+        storedUri = nil
+    }
 
     /// Parse NWC URI and save secret to keychain
     /// - Parameter code: The nostr+walletconnect:// URI string
