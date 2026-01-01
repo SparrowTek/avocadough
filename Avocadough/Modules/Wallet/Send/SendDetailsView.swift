@@ -8,7 +8,7 @@
 import SwiftUI
 import SwiftData
 import LightningDevKit
-import NostrSDK
+import NostrKit
 
 struct SendDetailsView: View {
     @Environment(SendState.self) private var state
@@ -17,14 +17,14 @@ struct SendDetailsView: View {
     @State private var amount = ""
     @State private var requestInProgress = false
     @State private var confirmationTrigger = PlainTaskTrigger()
-    @State private var payInvoiceResponse: PayInvoiceResponse?
+    @State private var paymentResult: WalletConnectManager.PaymentResult?
     @State private var errorMessage: LocalizedStringKey?
     @Query private var wallets: [Wallet]
-    
+
     private var wallet: Wallet? {
         wallets.first
     }
-    
+
     private var balance: LocalizedStringKey {
         if wallet?.balance.millisatsToSats ?? 0 == 1 {
             "balance: 1 sat"
@@ -32,10 +32,10 @@ struct SendDetailsView: View {
             "balance: \(wallet?.balance.millisatsToSats ?? 0) sats"
         }
     }
-    
+
     var body: some View {
         VStack(alignment: .leading) {
-            
+
             VStack(alignment: .leading) {
                 Text("sending to:")
                     .font(.headline)
@@ -43,7 +43,7 @@ struct SendDetailsView: View {
                     .font(.subheadline)
             }
             .padding()
-            
+
             VStack(alignment: .leading) {
                 Text("amount:")
                     .font(.headline)
@@ -54,7 +54,7 @@ struct SendDetailsView: View {
                     .font(.subheadline)
             }
             .padding(.horizontal)
-            
+
             HStack {
                 PresetSatVauleButton(value: "1K", action: { setAmount(1_000) } )
                 PresetSatVauleButton(value: "5K", action: { setAmount(5_000) } )
@@ -62,14 +62,14 @@ struct SendDetailsView: View {
                 PresetSatVauleButton(value: "25K", action: { setAmount(25_000) } )
             }
             .padding([.horizontal, .top])
-            
+
             Spacer()
-            
+
             HStack {
                 Button("cancel", action: cancel)
                     .frame(maxWidth: .infinity)
                     .buttonStyle(.avocadough)
-                
+
                 Button(action: triggerConfirmation) {
                     ZStack {
                         Text("confirm")
@@ -85,61 +85,64 @@ struct SendDetailsView: View {
         }
         .navigationTitle("send")
         .alert($errorMessage)
-        .onChange(of: payInvoiceResponse, payInvoiceResponseChanged)
+        .onChange(of: paymentResult?.preimage, paymentResultChanged)
         .task($confirmationTrigger) { await confirm() }
     }
-    
-    private func payInvoiceResponseChanged() {
-        guard payInvoiceResponse != nil else { return }
+
+    private func paymentResultChanged() {
+        guard paymentResult != nil else { return }
         state.paymentSent()
     }
-    
+
     private func setAmount(_ amount: Int) {
         self.amount = "\(amount)"
     }
-    
+
     private func cancel() {
         state.cancel()
     }
-    
+
     private func triggerConfirmation() {
         confirmationTrigger.trigger()
     }
-    
+
     private func confirm() async {
         defer { requestInProgress = false }
         requestInProgress = true
-        
+
         guard !amount.isEmpty else {
             errorMessage = "Sat amount can not be empty"
             return
         }
-        
+
         guard let amountAsInt = Int(amount), amountAsInt >= 1, amountAsInt <= 5_000_000 else {
             errorMessage = "Sat amount must be a number between 1 and 5,000,000"
             return
         }
-        
+
         guard let wallet, amountAsInt <= wallet.balance else {
             errorMessage = "Please select an amount less than or equal to your current Sat balance"
             return
         }
-        
+
         let millisats = satsToMillisats(sats: amount)
-        
+
         do {
             let invoicePR = try await GenerateInvoiceService().generateInvoice(lightningAddress: lightningAddress, amount: millisats, comment: nil).pr ?? ""
-            
-            guard let invoice = Bolt11Invoice.fromStr(s: invoicePR).getValue() else {
+
+            // Validate the invoice using LightningDevKit
+            guard Bolt11Invoice.fromStr(s: invoicePR).getValue() != nil else {
                 errorMessage = "Failed to create an invoice. Please try again."
                 return
             }
-            payInvoiceResponse = try await nwc.payInvoice(invoice)
+
+            // NostrKit's payInvoice takes the invoice string directly
+            paymentResult = try await nwc.payInvoice(invoicePR)
         } catch {
             errorMessage = "There was a problem sending your sats. Please try again later."
         }
     }
-    
+
     private func satsToMillisats(sats: String) -> String {
         guard let sats = Int(sats) else { return sats }
         return "\(sats * 1000)"
@@ -149,7 +152,7 @@ struct SendDetailsView: View {
 fileprivate struct PresetSatVauleButton: View {
     var value: String
     var action: () -> Void
-    
+
     var body: some View {
         Button(action: action) {
             HStack {

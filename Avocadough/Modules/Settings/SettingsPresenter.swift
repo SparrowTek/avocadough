@@ -251,7 +251,7 @@ struct AboutView: View {
                 Text("Avocadough is developed by SparrowTek LLC.")
                 
                 WebSectionView(title: "Attribution", content: """
-                Avocadough uses [rust-nostr](https://rust-nostr.org) for NWC functionality and we get the current Bitcoin price from [Block](https://block.xyz)'s pricing API. 
+                Avocadough uses [NostrKit](https://github.com/SparrowTek/NostrKit) for NWC functionality and we get the current Bitcoin price from [Block](https://block.xyz)'s pricing API.
                 """)
             }
         }

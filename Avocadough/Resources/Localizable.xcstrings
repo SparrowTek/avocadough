@@ -62,7 +62,7 @@
     "Avocadough is developed by SparrowTek LLC." : {
 
     },
-    "Avocadough uses [rust-nostr](https://rust-nostr.org) for NWC functionality and we get the current Bitcoin price from [Block](https://block.xyz)'s pricing API. " : {
+    "Avocadough uses [NostrKit](https://github.com/SparrowTek/NostrKit) for NWC functionality and we get the current Bitcoin price from [Block](https://block.xyz)'s pricing API." : {
 
     },
     "Avocadough’s app may collect aggregate, anonymous statistics, such as the percentage of users who use particular features, to improve the app." : {
@@ -146,7 +146,7 @@
     "Failed to create an invoice. Please try again." : {
 
     },
-    "failed to initzilize NWC wallet connection" : {
+    "failed to initialize NWC wallet connection" : {
 
     },
     "fees paid" : {

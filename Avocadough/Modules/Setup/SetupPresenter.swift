@@ -38,6 +38,7 @@ fileprivate struct SetupView: View {
     @Environment(\.modelContext) private var context
     @Query private var nwcCodes: [NWCConnection]
     @State private var requestCameraAccessTrigger = PlainTaskTrigger()
+    @State private var evaluateConnectionSecretTrigger = PlainTaskTrigger()
     @Environment(\.colorScheme) private var colorScheme
     
     private var buttonText: Color {
@@ -56,7 +57,7 @@ fileprivate struct SetupView: View {
                 TextField("", text: $state.connectionSecret, prompt: Text("enter connection secret")
                     .foregroundStyle(promoptText))
                     .textFieldStyle(.roundedBorder)
-                Button("enter", action: evaluateConnectionSecret)
+                Button("enter", action: triggerEvaluateConnectionSecret)
                     .foregroundStyle(buttonText)
                     .buttonStyle(.borderedProminent)
             }
@@ -88,15 +89,20 @@ fileprivate struct SetupView: View {
             }
         }
         .navigationBarTitleDisplayMode(.inline)
-        .onChange(of: state.foundQRCode) { parseWalletCode() }
         .onChange(of: nwc.hasConnected) { configApp() }
+        .task(id: state.foundQRCode) { await parseWalletCode() }
         .task($requestCameraAccessTrigger) { await requestCameraAccess() }
+        .task($evaluateConnectionSecretTrigger) { await evaluateConnectionSecret() }
         .fullScreenColorView()
     }
     
-    private func evaluateConnectionSecret() {
+    private func triggerEvaluateConnectionSecret() {
+        evaluateConnectionSecretTrigger.trigger()
+    }
+    
+    private func evaluateConnectionSecret() async {
         guard !state.connectionSecret.isEmpty else { return }
-        parseWalletCode(state.connectionSecret)
+        await parseWalletCode(state.connectionSecret)
     }
     
     private func tappedScanQR() {
@@ -122,19 +128,24 @@ fileprivate struct SetupView: View {
         }
     }
     
-    private func parseWalletCode() {
+    private func parseWalletCode() async {
         guard let code = state.foundQRCode else { return }
-        parseWalletCode(code)
+        await parseWalletCode(code)
     }
     
-    private func parseWalletCode(_ code: String) {
+    private func parseWalletCode(_ code: String) async {
         do {
             let nwcCode = try nwc.parseWalletCode(code)
             context.insert(nwcCode)
             try context.save()
-            try nwc.initializeNWCClient(pubKey: nwcCode.pubKey, relay: nwcCode.relay, lud16: nwcCode.lud16)
+            
+            do {
+                try await nwc.initializeNWCClient(pubKey: nwcCode.pubKey, relay: nwcCode.relay, lud16: nwcCode.lud16)
+            } catch {
+                state.errorMessage = "failed to initialize NWC wallet connection"
+            }
         } catch {
-            state.errorMessage = "failed to initzilize NWC wallet connection"
+            state.errorMessage = "failed to initialize NWC wallet connection"
         }
     }
     

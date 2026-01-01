@@ -6,41 +6,41 @@
 //
 
 @preconcurrency import SwiftData
-import NostrSDK
+import CoreNostr
 import SwiftUI
 
 enum AvocadoughTransactionType: String, Codable {
     case incoming
     case outgoing
-    
-    init(transactionType: TransactionType) {
+
+    init(transactionType: NWCTransactionType) {
         self = switch transactionType {
         case .incoming: .incoming
         case .outgoing: .outgoing
         }
     }
-    
+
     var title: LocalizedStringKey {
         switch self {
         case .incoming: "received"
         case .outgoing: "sent"
         }
     }
-    
+
     var arrow: String {
         switch self {
         case .incoming: "arrowshape.down.circle"
         case .outgoing: "arrowshape.up.circle"
         }
     }
-    
+
     var color: Color {
         switch self {
         case .incoming: .green
         case .outgoing: .red
         }
     }
-    
+
     var plusOrMinus: String {
         switch self {
         case .incoming: "+"
@@ -51,7 +51,7 @@ enum AvocadoughTransactionType: String, Codable {
 
 typealias Transaction = AvocadoughSchema.Transaction
 
-extension AvocadoughSchema {    
+extension AvocadoughSchema {
     @Model
     class Transaction {
         var transactionType: AvocadoughTransactionType?
@@ -67,8 +67,20 @@ extension AvocadoughSchema {
         var createdAt: UInt64?
         var expiresAt: UInt64?
         var settledAt: UInt64?
-        
-        init(transactionType: AvocadoughTransactionType? = nil, invoice: String? = nil, transactionDescription: String? = nil, descriptionHash: String? = nil, preimage: String? = nil, paymentHash: String, amount: UInt64, feesPaid: UInt64, createdAt: UInt64? = nil, expiresAt: UInt64? = nil, settledAt: UInt64? = nil) {
+
+        init(
+            transactionType: AvocadoughTransactionType? = nil,
+            invoice: String? = nil,
+            transactionDescription: String? = nil,
+            descriptionHash: String? = nil,
+            preimage: String? = nil,
+            paymentHash: String,
+            amount: UInt64,
+            feesPaid: UInt64,
+            createdAt: UInt64? = nil,
+            expiresAt: UInt64? = nil,
+            settledAt: UInt64? = nil
+        ) {
             self.transactionType = transactionType
             self.invoice = invoice
             self.transactionDescription = transactionDescription
@@ -81,24 +93,24 @@ extension AvocadoughSchema {
             self.expiresAt = expiresAt
             self.settledAt = settledAt
         }
-        
-        init(lookupInvoiceResponse: LookupInvoiceResponse) {
-            self.transactionType = if let transactionType = lookupInvoiceResponse.transactionType {
-                AvocadoughTransactionType(transactionType: transactionType)
-            } else {
-                nil
-            }
-            
-            self.invoice = lookupInvoiceResponse.invoice
-            self.transactionDescription = lookupInvoiceResponse.description
-            self.descriptionHash = lookupInvoiceResponse.descriptionHash
-            self.preimage = lookupInvoiceResponse.preimage
-            self.paymentHash = lookupInvoiceResponse.paymentHash
-            self.amount = lookupInvoiceResponse.amount
-            self.feesPaid = lookupInvoiceResponse.feesPaid
-            self.createdAt = lookupInvoiceResponse.createdAt.asSecs()
-            self.expiresAt = lookupInvoiceResponse.expiresAt?.asSecs()
-            self.settledAt = lookupInvoiceResponse.settledAt?.asSecs()
+
+        /// Initialize from NostrKit's NWCTransaction
+        init(nwcTransaction: NWCTransaction) {
+            self.transactionType = AvocadoughTransactionType(transactionType: nwcTransaction.type)
+            self.invoice = nwcTransaction.invoice
+            self.transactionDescription = nwcTransaction.description
+            self.descriptionHash = nwcTransaction.descriptionHash
+            self.preimage = nwcTransaction.preimage
+            self.paymentHash = nwcTransaction.paymentHash
+
+            // Convert Int64 amounts to UInt64 (NostrKit uses signed integers)
+            self.amount = UInt64(max(0, nwcTransaction.amount))
+            self.feesPaid = UInt64(max(0, nwcTransaction.feesPaid ?? 0))
+
+            // Convert TimeInterval (seconds since epoch as Double) to UInt64
+            self.createdAt = UInt64(nwcTransaction.createdAt)
+            self.expiresAt = nwcTransaction.expiresAt.map { UInt64($0) }
+            self.settledAt = nwcTransaction.settledAt.map { UInt64($0) }
         }
     }
 }
