@@ -233,10 +233,10 @@ If you have questions regarding this privacy policy, you may email contact@sparr
 If we decide to change our privacy policy, we will post those changes on this page. Summary of changes so far: June 3, 2025: First published.
 """)
             }
-            .padding([.horizontal, .bottom])
-            .navigationBarTitleDisplayMode(.inline)
-            .fullScreenColorView()
         }
+        .padding([.horizontal, .bottom])
+        .navigationBarTitleDisplayMode(.inline)
+        .fullScreenColorView()
     }
 }
 
