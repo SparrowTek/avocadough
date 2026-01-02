@@ -1,5 +1,5 @@
 {
-  "originHash" : "12b169b19f6ead2f990c8c6881510df9cbfe19dda1459cf7bf36296469db33dc",
+  "originHash" : "53b7bd1f1fcb360a16790fcf8e88e024edeac3ab85ce473c4f0146f131c0d664",
   "pins" : [
     {
       "identity" : "async-http-client",
@@ -29,6 +29,15 @@
       }
     },
     {
+      "identity" : "corenostr",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/SparrowTek/CoreNostr.git",
+      "state" : {
+        "branch" : "main",
+        "revision" : "fc9d029c9a4379018abd552cd5559b158d397a9c"
+      }
+    },
+    {
       "identity" : "jmespath.swift",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/jmespath/jmespath.swift.git",
@@ -44,6 +53,15 @@
       "state" : {
         "revision" : "e3fa435166527b1089787fd4ab0ce398849fb916",
         "version" : "0.0.123"
+      }
+    },
+    {
+      "identity" : "nostrkit",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/SparrowTek/NostrKit",
+      "state" : {
+        "branch" : "main",
+        "revision" : "8125a66b7a2ba2ccfdff2b477daa2002745acb1d"
       }
     },
     {
