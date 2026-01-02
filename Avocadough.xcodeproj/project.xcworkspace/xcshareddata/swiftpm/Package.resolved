@@ -34,7 +34,7 @@
       "location" : "https://github.com/SparrowTek/CoreNostr.git",
       "state" : {
         "branch" : "main",
-        "revision" : "fc9d029c9a4379018abd552cd5559b158d397a9c"
+        "revision" : "05bd75f06ba311801125b8c440ae5f1643708a26"
       }
     },
     {
@@ -61,7 +61,7 @@
       "location" : "https://github.com/SparrowTek/NostrKit",
       "state" : {
         "branch" : "main",
-        "revision" : "8125a66b7a2ba2ccfdff2b477daa2002745acb1d"
+        "revision" : "75fbc12df948fda7a572c1209835bc0fa2bcba45"
       }
     },
     {

@@ -126,20 +126,28 @@ struct SendDetailsView: View {
         }
 
         let millisats = satsToMillisats(sats: amount)
+        let invoicePR: String
+        
+        do {
+            invoicePR = try await GenerateInvoiceService().generateInvoice(lightningAddress: lightningAddress, amount: millisats, comment: nil).pr ?? ""
+        } catch {
+            errorMessage = "Failed to create an invoice. Please try again."
+            return
+        }
+
+        // Validate the invoice using LightningDevKit
+        guard Bolt11Invoice.fromStr(s: invoicePR).getValue() != nil else {
+            errorMessage = "Failed to create an invoice. Please try again."
+            return
+        }
 
         do {
-            let invoicePR = try await GenerateInvoiceService().generateInvoice(lightningAddress: lightningAddress, amount: millisats, comment: nil).pr ?? ""
-
-            // Validate the invoice using LightningDevKit
-            guard Bolt11Invoice.fromStr(s: invoicePR).getValue() != nil else {
-                errorMessage = "Failed to create an invoice. Please try again."
-                return
-            }
-
             // NostrKit's payInvoice takes the invoice string directly
             paymentResult = try await nwc.payInvoice(invoicePR)
         } catch {
-            errorMessage = "There was a problem sending your sats. Please try again later."
+            // Payment may have succeeded even if we got an error (e.g., timeout waiting for response).
+            // Treat this as success and let the transaction sync show the actual status.
+            state.paymentSent()
         }
     }
 
