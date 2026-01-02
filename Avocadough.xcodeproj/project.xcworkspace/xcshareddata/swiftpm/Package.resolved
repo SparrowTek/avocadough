@@ -1,5 +1,5 @@
 {
-  "originHash" : "3c88fc3409164ab67b5dae17c7c5f1002187d88a1d9e5ff33709858430162dac",
+  "originHash" : "53b7bd1f1fcb360a16790fcf8e88e024edeac3ab85ce473c4f0146f131c0d664",
   "pins" : [
     {
       "identity" : "async-http-client",
@@ -34,7 +34,7 @@
       "location" : "https://github.com/SparrowTek/CoreNostr.git",
       "state" : {
         "branch" : "main",
-        "revision" : "fc9d029c9a4379018abd552cd5559b158d397a9c"
+        "revision" : "05bd75f06ba311801125b8c440ae5f1643708a26"
       }
     },
     {
@@ -61,7 +61,7 @@
       "location" : "https://github.com/SparrowTek/NostrKit",
       "state" : {
         "branch" : "main",
-        "revision" : "7becf245e21ac81225eb28980f2346e6e2a30d00"
+        "revision" : "75fbc12df948fda7a572c1209835bc0fa2bcba45"
       }
     },
     {

@@ -68,6 +68,8 @@ class NWC {
     ///   - relay: The relay URL
     ///   - lud16: Optional lightning address
     func initializeNWCClient(pubKey: String, relay: String, lud16: String?) async throws(NWCError) {
+        // Prevent multiple connections
+        guard !hasConnected else { return }
         guard let secret else { throw .noSecret }
 
         // Reconstruct URI from components if we don't have it stored
