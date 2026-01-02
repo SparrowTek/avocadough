@@ -7,8 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		6C6F2A2E2F06EFAE00639784 /* NostrKit in Frameworks */ = {isa = PBXBuildFile; productRef = 6C6F2A2D2F06EFAE00639784 /* NostrKit */; };
 		6C73E5F82B3F0F3B0073C816 /* Vault in Frameworks */ = {isa = PBXBuildFile; productRef = 6C73E5F72B3F0F3B0073C816 /* Vault */; };
-		6CD67D6F2F044C8C00E8B95D /* NostrKit in Frameworks */ = {isa = PBXBuildFile; productRef = 6CD67D6E2F044C8C00E8B95D /* NostrKit */; };
 		6CECC8AA2C5C03E7000F688B /* LightningDevKit in Frameworks */ = {isa = PBXBuildFile; productRef = 6CECC8A92C5C03E7000F688B /* LightningDevKit */; };
 /* End PBXBuildFile section */
 
@@ -38,7 +38,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				6CD67D6F2F044C8C00E8B95D /* NostrKit in Frameworks */,
+				6C6F2A2E2F06EFAE00639784 /* NostrKit in Frameworks */,
 				6C73E5F82B3F0F3B0073C816 /* Vault in Frameworks */,
 				6CECC8AA2C5C03E7000F688B /* LightningDevKit in Frameworks */,
 			);
@@ -88,7 +88,7 @@
 			packageProductDependencies = (
 				6C73E5F72B3F0F3B0073C816 /* Vault */,
 				6CECC8A92C5C03E7000F688B /* LightningDevKit */,
-				6CD67D6E2F044C8C00E8B95D /* NostrKit */,
+				6C6F2A2D2F06EFAE00639784 /* NostrKit */,
 			);
 			productName = Boostz;
 			productReference = 6CDD4BE82B25210E00C6C324 /* Avocadough.app */;
@@ -121,7 +121,7 @@
 			packageReferences = (
 				6C73E5F62B3F0F3B0073C816 /* XCRemoteSwiftPackageReference "Vault" */,
 				6CECC8A82C5C03E7000F688B /* XCRemoteSwiftPackageReference "ldk-swift" */,
-				6CD67D6D2F044C8C00E8B95D /* XCRemoteSwiftPackageReference "NostrKit" */,
+				6C6F2A2C2F06EFAE00639784 /* XCLocalSwiftPackageReference "../NostrKit" */,
 			);
 			productRefGroup = 6CDD4BE92B25210E00C6C324 /* Products */;
 			projectDirPath = "";
@@ -375,6 +375,13 @@
 		};
 /* End XCConfigurationList section */
 
+/* Begin XCLocalSwiftPackageReference section */
+		6C6F2A2C2F06EFAE00639784 /* XCLocalSwiftPackageReference "../NostrKit" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ../NostrKit;
+		};
+/* End XCLocalSwiftPackageReference section */
+
 /* Begin XCRemoteSwiftPackageReference section */
 		6C73E5F62B3F0F3B0073C816 /* XCRemoteSwiftPackageReference "Vault" */ = {
 			isa = XCRemoteSwiftPackageReference;
@@ -382,14 +389,6 @@
 			requirement = {
 				kind = upToNextMajorVersion;
 				minimumVersion = 1.2.0;
-			};
-		};
-		6CD67D6D2F044C8C00E8B95D /* XCRemoteSwiftPackageReference "NostrKit" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/SparrowTek/NostrKit";
-			requirement = {
-				branch = main;
-				kind = branch;
 			};
 		};
 		6CECC8A82C5C03E7000F688B /* XCRemoteSwiftPackageReference "ldk-swift" */ = {
@@ -403,15 +402,14 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		6C6F2A2D2F06EFAE00639784 /* NostrKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = NostrKit;
+		};
 		6C73E5F72B3F0F3B0073C816 /* Vault */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 6C73E5F62B3F0F3B0073C816 /* XCRemoteSwiftPackageReference "Vault" */;
 			productName = Vault;
-		};
-		6CD67D6E2F044C8C00E8B95D /* NostrKit */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 6CD67D6D2F044C8C00E8B95D /* XCRemoteSwiftPackageReference "NostrKit" */;
-			productName = NostrKit;
 		};
 		6CECC8A92C5C03E7000F688B /* LightningDevKit */ = {
 			isa = XCSwiftPackageProductDependency;
