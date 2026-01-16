@@ -8,175 +8,150 @@
 import SwiftUI
 import SwiftData
 import LightningDevKit
-import NostrKit
 
 struct SendDetailsView: View {
     @Environment(SendState.self) private var state
-    @Environment(\.nwc) private var nwc
     var lightningAddress: String
-    @State private var amount = ""
-    @State private var requestInProgress = false
-    @State private var confirmationTrigger = PlainTaskTrigger()
-    @State private var paymentResult: WalletConnectManager.PaymentResult?
+    @State private var amount: UInt64 = 0
+    @State private var isLoading = false
     @State private var errorMessage: LocalizedStringKey?
+    @State private var generateInvoiceTrigger = PlainTaskTrigger()
     @Query private var wallets: [Wallet]
 
     private var wallet: Wallet? {
         wallets.first
     }
 
-    private var balance: LocalizedStringKey {
-        if wallet?.balance.millisatsToSats ?? 0 == 1 {
-            "balance: 1 sat"
-        } else {
-            "balance: \(wallet?.balance.millisatsToSats ?? 0) sats"
-        }
+    private var maxAmount: UInt64 {
+        UInt64(wallet?.balance.millisatsToSats ?? 0)
+    }
+
+    private var btcPrice: Double? {
+        state.btcPrice
     }
 
     var body: some View {
-        VStack(alignment: .leading) {
+        VStack(spacing: 0) {
+            // Recipient header
+            recipientHeader
 
-            VStack(alignment: .leading) {
-                Text("sending to:")
-                    .font(.headline)
+            // Amount entry
+            AmountEntryView(
+                amount: $amount,
+                maxAmount: maxAmount,
+                btcPrice: btcPrice,
+                buttonTitle: "Continue",
+                isLoading: isLoading
+            ) {
+                triggerGenerateInvoice()
+            }
+        }
+        .fullScreenColorView()
+        .navigationTitle("Send")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .topBarLeading) {
+                Button("Cancel", action: cancel)
+            }
+        }
+        .alert($errorMessage)
+        .task($generateInvoiceTrigger) { await generateInvoiceAndContinue() }
+    }
+
+    // MARK: - Subviews
+
+    private var recipientHeader: some View {
+        HStack(spacing: DesignTokens.Spacing.sm) {
+            Image(systemName: "bolt.fill")
+                .font(.system(size: 16, weight: .semibold))
+                .foregroundStyle(DesignTokens.Colors.Accent.primary)
+                .frame(width: 32, height: 32)
+                .background(DesignTokens.Colors.Accent.primary.opacity(0.15))
+                .clipShape(Circle())
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text("Sending to")
+                    .font(DesignTokens.Typography.caption)
+                    .foregroundStyle(Color.ds.textTertiary)
+
                 Text(lightningAddress)
-                    .font(.subheadline)
+                    .font(DesignTokens.Typography.subheadline)
+                    .fontWeight(.medium)
+                    .foregroundStyle(Color.ds.textPrimary)
+                    .lineLimit(1)
+                    .truncationMode(.middle)
             }
-            .padding()
-
-            VStack(alignment: .leading) {
-                Text("amount:")
-                    .font(.headline)
-                TextField("between 1 and 500,000 sats", text: $amount)
-                    .font(.subheadline)
-                    .textFieldStyle(.roundedBorder)
-                Text(balance)
-                    .font(.subheadline)
-            }
-            .padding(.horizontal)
-
-            HStack {
-                PresetSatVauleButton(value: "1K", action: { setAmount(1_000) } )
-                PresetSatVauleButton(value: "5K", action: { setAmount(5_000) } )
-                PresetSatVauleButton(value: "10K", action: { setAmount(10_000) } )
-                PresetSatVauleButton(value: "25K", action: { setAmount(25_000) } )
-            }
-            .padding([.horizontal, .top])
 
             Spacer()
-
-            HStack {
-                Button("cancel", action: cancel)
-                    .frame(maxWidth: .infinity)
-                    .buttonStyle(.avocadough)
-
-                Button(action: triggerConfirmation) {
-                    ZStack {
-                        Text("confirm")
-                            .opacity(requestInProgress ? 0 : 1)
-                        ProgressView()
-                            .opacity(requestInProgress ? 1 : 0)
-                    }
-                }
-                .frame(maxWidth: .infinity)
-                .buttonStyle(.avocadough)
-            }
-            .padding()
         }
-        .navigationTitle("send")
-        .alert($errorMessage)
-        .onChange(of: paymentResult?.preimage, paymentResultChanged)
-        .task($confirmationTrigger) { await confirm() }
+        .padding(DesignTokens.Spacing.md)
+        .background(DesignTokens.Colors.Background.secondary)
     }
 
-    private func paymentResultChanged() {
-        guard paymentResult != nil else { return }
-        state.paymentSent()
-    }
-
-    private func setAmount(_ amount: Int) {
-        self.amount = "\(amount)"
-    }
+    // MARK: - Actions
 
     private func cancel() {
         state.cancel()
     }
 
-    private func triggerConfirmation() {
-        confirmationTrigger.trigger()
+    private func triggerGenerateInvoice() {
+        generateInvoiceTrigger.trigger()
     }
 
-    private func confirm() async {
-        defer { requestInProgress = false }
-        requestInProgress = true
+    private func generateInvoiceAndContinue() async {
+        isLoading = true
+        defer { isLoading = false }
 
-        guard !amount.isEmpty else {
-            errorMessage = "Sat amount can not be empty"
+        guard amount >= 1 else {
+            errorMessage = "Please enter an amount"
             return
         }
 
-        guard let amountAsInt = Int(amount), amountAsInt >= 1, amountAsInt <= 5_000_000 else {
-            errorMessage = "Sat amount must be a number between 1 and 5,000,000"
+        guard amount <= 5_000_000 else {
+            errorMessage = "Amount must be 5,000,000 sats or less"
             return
         }
 
-        guard let wallet, amountAsInt <= wallet.balance else {
-            errorMessage = "Please select an amount less than or equal to your current Sat balance"
+        guard amount <= maxAmount else {
+            errorMessage = "Amount exceeds available balance"
             return
         }
 
-        let millisats = satsToMillisats(sats: amount)
-        let invoicePR: String
-        
-        do {
-            invoicePR = try await GenerateInvoiceService().generateInvoice(lightningAddress: lightningAddress, amount: millisats, comment: nil).pr ?? ""
-        } catch {
-            errorMessage = "Failed to create an invoice. Please try again."
-            return
-        }
-
-        // Validate the invoice using LightningDevKit
-        guard Bolt11Invoice.fromStr(s: invoicePR).getValue() != nil else {
-            errorMessage = "Failed to create an invoice. Please try again."
-            return
-        }
+        let millisats = "\(amount * 1000)"
 
         do {
-            // NostrKit's payInvoice takes the invoice string directly
-            paymentResult = try await nwc.payInvoice(invoicePR)
-        } catch {
-            // Payment may have succeeded even if we got an error (e.g., timeout waiting for response).
-            // Treat this as success and let the transaction sync show the actual status.
-            state.paymentSent()
-        }
-    }
+            let invoice = try await GenerateInvoiceService().generateInvoice(
+                lightningAddress: lightningAddress,
+                amount: millisats,
+                comment: nil
+            )
 
-    private func satsToMillisats(sats: String) -> String {
-        guard let sats = Int(sats) else { return sats }
-        return "\(sats * 1000)"
-    }
-}
-
-fileprivate struct PresetSatVauleButton: View {
-    var value: String
-    var action: () -> Void
-
-    var body: some View {
-        Button(action: action) {
-            HStack {
-                Text(value)
-                Image(systemName: "bolt.fill")
-                    .foregroundStyle(Color.yellow)
+            guard let invoicePR = invoice.pr, !invoicePR.isEmpty else {
+                errorMessage = "Failed to create invoice. Please try again."
+                return
             }
-            .frame(maxWidth: .infinity)
+
+            // Validate the invoice using LightningDevKit
+            guard Bolt11Invoice.fromStr(s: invoicePR).getValue() != nil else {
+                errorMessage = "Failed to create invoice. Please try again."
+                return
+            }
+
+            // Navigate to review screen
+            state.navigateToReview(recipient: lightningAddress, amount: amount, invoicePR: invoicePR)
+        } catch {
+            errorMessage = "Failed to create invoice. Please try again."
         }
-        .buttonStyle(.avocadough)
     }
 }
+
+// MARK: - Preview
 
 #Preview {
+    @Previewable @State var appState = AppState()
+
     NavigationStack {
-        SendDetailsView(lightningAddress: "SparrowTek@getalby.com")
-            .environment(SendState(parentState: .init(parentState: .init())))
+        SendDetailsView(lightningAddress: "sparrowtek@getalby.com")
+            .environment(appState.walletState.sendState)
     }
 }

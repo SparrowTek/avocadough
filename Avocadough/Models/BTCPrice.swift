@@ -11,4 +11,8 @@ struct BTCPrice: Codable, Sendable {
     let currency: String
     let version: String
     let base: String
+
+    var priceAsDouble: Double? {
+        Double(amount)
+    }
 }

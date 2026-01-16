@@ -10,28 +10,36 @@ import SwiftUI
 struct CreateInvoiceView: View {
     @Environment(ReceiveState.self) private var state
     @Environment(\.nwc) private var nwc
-    @State private var amount = ""
-    @State private var description = ""
+    @State private var amount: UInt64 = 0
+    @State private var isLoading = false
     @State private var createInvoiceTrigger = PlainTaskTrigger()
-    
+
+    private var btcPrice: Double? {
+        state.btcPrice
+    }
+
     var body: some View {
-        VStack(alignment: .leading) {
-            Text("amount")
-            TextField("amount in satoshi", text: $amount)
-                .textFieldStyle(.roundedBorder)
-            
-            Text("description")
-                .padding(.top)
-            TextField("for e.g. who is sending this payment?", text: $description)
-                .textFieldStyle(.roundedBorder)
-            
-            Button("create invoice", action: triggerCreateInvoice)
-                .frame(maxWidth: .infinity)
-                .buttonStyle(.avocadough)
-                .padding(.top)
+        VStack(spacing: 0) {
+            // Header
+            Text("Enter amount to request")
+                .font(DesignTokens.Typography.subheadline)
+                .foregroundStyle(Color.ds.textSecondary)
+                .padding(.top, DesignTokens.Spacing.md)
+
+            // Amount entry
+            AmountEntryView(
+                amount: $amount,
+                maxAmount: nil,
+                btcPrice: btcPrice,
+                buttonTitle: "Create Invoice",
+                isLoading: isLoading
+            ) {
+                triggerCreateInvoice()
+            }
         }
         .fullScreenColorView()
-        .padding(.horizontal)
+        .navigationTitle("Request Payment")
+        .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button("Done", action: doneTapped)
@@ -39,36 +47,41 @@ struct CreateInvoiceView: View {
         }
         .task($createInvoiceTrigger) { await createInvoice() }
     }
-    
+
     private func doneTapped() {
         state.doneTapped()
     }
-    
+
     private func triggerCreateInvoice() {
         createInvoiceTrigger.trigger()
     }
-    
+
     private func createInvoice() async {
-        guard let amount = UInt64(amount) else {
-            state.errorMessage = "Please enter a real number for the amount"
+        guard amount > 0 else {
+            state.errorMessage = "Please enter an amount"
             return
         }
-        
-        let description: String? = description.isEmpty ? nil : description
-        
-        guard let invoice = try? await nwc.makeInvoice(amount: amount, description: description, descriptionHash: nil, expiry: nil) else { return }
+
+        isLoading = true
+        defer { isLoading = false }
+
+        guard let invoice = try? await nwc.makeInvoice(amount: amount, description: nil, descriptionHash: nil, expiry: nil) else {
+            state.errorMessage = "Failed to create invoice. Please try again."
+            return
+        }
         state.path.append(.displayInvoice(invoice))
     }
 }
 
 #Preview {
     @Previewable @State var present = true
-    
+    @Previewable @State var appState = AppState()
+
     Text("wallet")
         .sheet(isPresented: $present) {
             NavigationStack {
                 CreateInvoiceView()
-                    .environment(ReceiveState(parentState: .init(parentState: .init())))
+                    .environment(appState.walletState.receiveState)
                     .environment(\.nwc, NWC())
             }
         }

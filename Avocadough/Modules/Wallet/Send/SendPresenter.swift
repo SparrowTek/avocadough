@@ -10,10 +10,10 @@ import SwiftUI
 
 struct SendPresenter: View {
     @Environment(SendState.self) private var state
-    
+
     var body: some View {
         @Bindable var state = state
-        
+
         NavigationStack(path: $state.path) {
             SendView()
                 .navigationDestination(for: SendState.NavigationLink.self) {
@@ -22,6 +22,22 @@ struct SendPresenter: View {
                         SendDetailsView(lightningAddress: address)
                     case .sendInvoice(let bolt11):
                         SendConfirmationView(bolt11: bolt11)
+                    case .reviewPayment(let recipient, let amount, let invoicePR):
+                        SendReviewView(
+                            recipient: recipient,
+                            amount: amount,
+                            invoicePR: invoicePR,
+                            btcPrice: state.btcPrice
+                        )
+                    case .paymentSuccess(let amount, let recipient):
+                        PaymentSuccessView(
+                            amount: amount,
+                            recipient: recipient,
+                            btcPrice: state.btcPrice
+                        ) {
+                            state.paymentSent()
+                        }
+                        .navigationBarBackButtonHidden()
                     case .scanQR:
                         ScanQRCodeView()
                             .environment(state.scanQRCodeState)
@@ -96,10 +112,12 @@ fileprivate struct SendView: View {
 }
 
 #Preview {
+    @Previewable @State var state = AppState()
+    
     Text("wallet")
         .sheet(isPresented: .constant(true)) {
             SendPresenter()
-                .environment(AppState())
-                .environment(SendState(parentState: .init(parentState: .init())))
+                .environment(state)
+                .environment(state.walletState.sendState)
         }
 }

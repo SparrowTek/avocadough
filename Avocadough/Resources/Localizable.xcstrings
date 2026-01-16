@@ -7,6 +7,9 @@
     ":" : {
 
     },
+    "%@ sats" : {
+
+    },
     "%@%@" : {
       "localizations" : {
         "en" : {
@@ -20,16 +23,13 @@
     "%llu sats" : {
 
     },
-    "%llu SATS" : {
-
-    },
     "••••••" : {
 
     },
-    "≈ %@" : {
+    "+%@" : {
 
     },
-    "1 SAT" : {
+    "≈ %@" : {
 
     },
     "About" : {
@@ -38,13 +38,10 @@
     "Activity" : {
 
     },
-    "amount" : {
+    "Amount exceeds available balance" : {
 
     },
-    "amount in satoshi" : {
-
-    },
-    "amount:" : {
+    "Amount must be 5,000,000 sats or less" : {
 
     },
     "Analytics" : {
@@ -86,15 +83,6 @@
     "Avocadough’s app may collect aggregate, anonymous statistics, such as the percentage of users who use particular features, to improve the app." : {
 
     },
-    "balance: %llu sats" : {
-
-    },
-    "balance: 1 sat" : {
-
-    },
-    "between 1 and 500,000 sats" : {
-
-    },
     "By using Avocadough and providing your information, you authorize us to collect, use, and store your information outside of the European Union." : {
 
     },
@@ -104,16 +92,10 @@
     "California Online Privacy Protection Act Compliance" : {
 
     },
-    "cancel" : {
-
-    },
     "Cancel" : {
 
     },
     "Changes to this policy" : {
-
-    },
-    "check status" : {
 
     },
     "Children’s Online Privacy Protection Act Compliance" : {
@@ -140,13 +122,13 @@
     "Continue" : {
 
     },
-    "copied!" : {
+    "Copied!" : {
 
     },
-    "copy invoice" : {
+    "Copy Invoice" : {
 
     },
-    "create invoice" : {
+    "Create Invoice" : {
 
     },
     "dark" : {
@@ -156,9 +138,6 @@
 
     },
     "dark mode tint" : {
-
-    },
-    "description" : {
 
     },
     "Disconnect" : {
@@ -179,6 +158,9 @@
     "enter" : {
 
     },
+    "Enter amount to request" : {
+
+    },
     "enter connection secret" : {
 
     },
@@ -188,16 +170,13 @@
     "Failed to connect to your wallet" : {
 
     },
-    "Failed to create an invoice. Please try again." : {
+    "Failed to create invoice. Please try again." : {
 
     },
     "failed to initialize NWC wallet connection" : {
 
     },
     "fees paid" : {
-
-    },
-    "for e.g. who is sending this payment?" : {
 
     },
     "General" : {
@@ -227,6 +206,9 @@
     "International Transfers of Information" : {
 
     },
+    "Invoice" : {
+
+    },
     "invoice, lightning address, or LNURL" : {
 
     },
@@ -237,9 +219,6 @@
 
     },
     "light mode tint" : {
-
-    },
-    "lightning invoice" : {
 
     },
     "Loading..." : {
@@ -269,7 +248,7 @@
     "Our server software may store basic technical information, such as your IP address, in temporary memory or logs." : {
 
     },
-    "paid" : {
+    "Paid" : {
 
     },
     "Paste" : {
@@ -278,13 +257,16 @@
     "payment hash" : {
 
     },
+    "Payment Received!" : {
+
+    },
+    "Payment Sent!" : {
+
+    },
     "Pending" : {
 
     },
-    "Please enter a real number for the amount" : {
-
-    },
-    "Please select an amount less than or equal to your current Sat balance" : {
+    "Please enter an amount" : {
 
     },
     "Poor network connection" : {
@@ -311,16 +293,16 @@
     "Recent Activity" : {
 
     },
-    "request instant and specific amount payment" : {
+    "Request a specific amount" : {
+
+    },
+    "Request Payment" : {
 
     },
     "reset theme" : {
 
     },
-    "Sat amount can not be empty" : {
-
-    },
-    "Sat amount must be a number between 1 and 5,000,000" : {
+    "Review Payment" : {
 
     },
     "sats" : {
@@ -332,10 +314,10 @@
     "scan QR" : {
 
     },
-    "selected color scheme" : {
+    "Scan to send sats" : {
 
     },
-    "send" : {
+    "selected color scheme" : {
 
     },
     "Send" : {
@@ -344,16 +326,22 @@
     "send BTC" : {
 
     },
-    "sending to:" : {
+    "Sending to" : {
 
     },
     "sent" : {
+
+    },
+    "Sent!" : {
 
     },
     "Settings" : {
 
     },
     "settled at" : {
+
+    },
+    "Slide to Send" : {
 
     },
     "Source (Github)" : {
@@ -404,13 +392,16 @@
     "This will remove your wallet connection and all local data." : {
 
     },
+    "to" : {
+
+    },
     "Transaction" : {
 
     },
     "Try a different search term" : {
 
     },
-    "waiting for payment..." : {
+    "Waiting for payment..." : {
 
     },
     "Wallet" : {

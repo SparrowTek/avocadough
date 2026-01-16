@@ -15,6 +15,8 @@ class SendState {
     enum NavigationLink: Hashable {
         case sendInvoice(Bolt11Invoice)
         case getLightningAddressDetails(String)
+        case reviewPayment(recipient: String, amount: UInt64, invoicePR: String)
+        case paymentSuccess(amount: UInt64, recipient: String)
         case scanQR
     }
     
@@ -31,6 +33,10 @@ class SendState {
     private unowned let parentState: WalletState
     var path: [SendState.NavigationLink] = []
     var errorMessage: LocalizedStringKey?
+    var btcPrice: Double? {
+        parentState.btcPrice?.priceAsDouble
+    }
+    
     @ObservationIgnored
     lazy var scanQRCodeState = ScanQRCodeState(parentState: self)
     
@@ -41,7 +47,17 @@ class SendState {
     func cancel() {
         clearPathAndCloseSheet()
     }
-    
+
+    func navigateToReview(recipient: String, amount: UInt64, invoicePR: String) {
+        path.append(.reviewPayment(recipient: recipient, amount: amount, invoicePR: invoicePR))
+    }
+
+    func showPaymentSuccess(amount: UInt64, recipient: String) {
+        // Replace entire path with success screen
+        path = [.paymentSuccess(amount: amount, recipient: recipient)]
+        parentState.paymentSent()
+    }
+
     func paymentSent() {
         parentState.paymentSent()
         clearPathAndCloseSheet()
