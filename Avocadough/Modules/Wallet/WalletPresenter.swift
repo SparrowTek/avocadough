@@ -114,6 +114,7 @@ private struct WalletView: View {
                         .foregroundStyle(Color.yellow)
                 }
             }
+            .sharedBackgroundVisibility(.hidden)
         }
         .refreshable { await refresh() }
         .syncTransactionData(requestInProgress: $requestInProgress)
