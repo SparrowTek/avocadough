@@ -3,6 +3,7 @@
 //  Avocadough
 //
 
+// TODO: a lot of this should be deleted!
 import SwiftUI
 
 // MARK: - SheetHeader
@@ -180,32 +181,47 @@ extension View {
 
 /// A view for displaying empty states with icon and action
 struct EmptyStateView: View {
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @State private var hasAppeared = false
+
     let icon: String
     let title: LocalizedStringKey
     let message: LocalizedStringKey?
     let actionTitle: LocalizedStringKey?
     let action: (() -> Void)?
+    let iconColor: Color?
 
     init(
         icon: String,
         title: LocalizedStringKey,
         message: LocalizedStringKey? = nil,
         actionTitle: LocalizedStringKey? = nil,
-        action: (() -> Void)? = nil
+        action: (() -> Void)? = nil,
+        iconColor: Color? = nil
     ) {
         self.icon = icon
         self.title = title
         self.message = message
         self.actionTitle = actionTitle
         self.action = action
+        self.iconColor = iconColor
     }
 
     var body: some View {
         VStack(spacing: DesignTokens.Spacing.lg) {
-            // Icon
-            Image(systemName: icon)
-                .font(.system(size: 48, weight: .light))
-                .foregroundStyle(Color.ds.textTertiary)
+            // Icon with optional colored background
+            if let iconColor {
+                Image(systemName: icon)
+                    .font(.system(size: 28, weight: .semibold))
+                    .foregroundStyle(iconColor)
+                    .frame(width: 72, height: 72)
+                    .background(iconColor.opacity(0.15))
+                    .clipShape(Circle())
+            } else {
+                Image(systemName: icon)
+                    .font(.system(size: 48, weight: .light))
+                    .foregroundStyle(Color.ds.textTertiary)
+            }
 
             // Text
             VStack(spacing: DesignTokens.Spacing.sm) {
@@ -228,6 +244,10 @@ struct EmptyStateView: View {
             }
         }
         .padding(DesignTokens.Spacing.xl)
+        .opacity(hasAppeared ? 1 : 0)
+        .offset(y: hasAppeared ? 0 : 10)
+        .animation(reduceMotion ? .none : DesignTokens.Animation.smooth, value: hasAppeared)
+        .onAppear { hasAppeared = true }
     }
 }
 

@@ -29,6 +29,9 @@
     "≈ %@" : {
 
     },
+    "A beautiful wallet for the\nLightning Network" : {
+
+    },
     "About" : {
 
     },
@@ -113,6 +116,9 @@
     "Confirm invoice:" : {
 
     },
+    "Connect Your Wallet" : {
+
+    },
     "Connected" : {
 
     },
@@ -155,13 +161,7 @@
     "Double tap to switch currency display" : {
 
     },
-    "enter" : {
-
-    },
     "Enter amount to request" : {
-
-    },
-    "enter connection secret" : {
 
     },
     "Error" : {
@@ -170,13 +170,19 @@
     "Failed to connect to your wallet" : {
 
     },
+    "Failed to connect wallet. Please check your connection string and try again." : {
+
+    },
     "Failed to create invoice. Please try again." : {
 
     },
-    "failed to initialize NWC wallet connection" : {
+    "General" : {
 
     },
-    "General" : {
+    "Get one here" : {
+
+    },
+    "Get Started" : {
 
     },
     "go" : {
@@ -203,6 +209,9 @@
     "International Transfers of Information" : {
 
     },
+    "Invalid connection string. Please scan a valid NWC QR code." : {
+
+    },
     "Invoice" : {
 
     },
@@ -224,6 +233,9 @@
     "Max" : {
 
     },
+    "Need a wallet?" : {
+
+    },
     "No Results" : {
 
     },
@@ -233,10 +245,13 @@
     "No Transactions Yet" : {
 
     },
+    "nostr+walletconnect://..." : {
+
+    },
     "OK" : {
 
     },
-    "or" : {
+    "or paste connection string" : {
 
     },
     "OR:" : {
@@ -266,7 +281,7 @@
     "Poor network connection" : {
 
     },
-    "preparing your wallet" : {
+    "Preparing your wallet" : {
 
     },
     "Privacy" : {
@@ -303,6 +318,12 @@
 
     },
     "scan QR" : {
+
+    },
+    "Scan QR Code" : {
+
+    },
+    "Scan the NWC QR code from your\nwallet provider to get started" : {
 
     },
     "Scan to send sats" : {
@@ -389,6 +410,9 @@
     "Try a different search term" : {
 
     },
+    "Use your camera to scan" : {
+
+    },
     "Waiting for payment..." : {
 
     },
@@ -402,6 +426,9 @@
 
     },
     "We use the information we collect to operate and improve our website, apps, and customer support.\n\nWe do not share personal information with outside parties except to the extent necessary to accomplish Avocadough’s functionality.\nWe may disclose your information in response to subpoenas, court orders, or other legal requirements; to exercise our legal rights or defend against legal claims; to investigate, prevent, or take action regarding illegal activities, suspected fraud or abuse, violations of our policies; or to protect our rights and property.\n\nIn the future, we may sell to, buy, merge with, or partner with other businesses. In such transactions, user information may be among the transferred assets." : {
+
+    },
+    "Your Bitcoin,\nYour Control." : {
 
     },
     "Your Consent" : {
