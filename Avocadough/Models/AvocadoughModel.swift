@@ -18,6 +18,7 @@ enum AvocadoughSchemaV1: VersionedSchema, Sendable {
             NWCConnection.self,
             Transaction.self,
             Wallet.self,
+            WalletConfig.self,
         ]
     }
 }
@@ -29,6 +30,7 @@ struct AvocadoughDataContainerViewModifier: ViewModifier {
         NWCConnection.self,
         Transaction.self,
         Wallet.self,
+        WalletConfig.self,
     ])
     
     init(inMemory: Bool) {

@@ -22,6 +22,7 @@ struct MainTabView: View {
             Tab(AppState.Tab.activity.title, systemImage: AppState.Tab.activity.icon, value: .activity) {
                 ActivityPresenter()
                     .environment(state.activityState)
+                    .environment(state.walletState)
             }
             
             Tab(AppState.Tab.settings.title, systemImage: AppState.Tab.settings.icon, value: .settings) {

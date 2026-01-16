@@ -4,6 +4,9 @@
     "" : {
 
     },
+    "%@" : {
+
+    },
     "%@ sats" : {
 
     },
@@ -36,6 +39,9 @@
 
     },
     "Activity" : {
+
+    },
+    "Add Wallet" : {
 
     },
     "Amount exceeds available balance" : {
@@ -95,6 +101,9 @@
     "Cancel" : {
 
     },
+    "Cashu" : {
+
+    },
     "Changes to this policy" : {
 
     },
@@ -105,6 +114,9 @@
 
     },
     "Color Scheme" : {
+
+    },
+    "Coming Soon" : {
 
     },
     "Completed" : {
@@ -225,6 +237,9 @@
 
     },
     "light mode tint" : {
+
+    },
+    "Lightning" : {
 
     },
     "Loading..." : {
