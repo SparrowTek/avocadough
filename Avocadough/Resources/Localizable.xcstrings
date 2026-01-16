@@ -23,6 +23,12 @@
     "%llu SATS" : {
 
     },
+    "••••••" : {
+
+    },
+    "≈ %@" : {
+
+    },
     "1 SAT" : {
 
     },
@@ -42,6 +48,9 @@
 
     },
     "Attribution" : {
+
+    },
+    "Available:" : {
 
     },
     "Avocadoguh is a free and open source application. Please consider sending some sats to help support ongoing development efforts." : {
@@ -89,6 +98,9 @@
     "cancel" : {
 
     },
+    "Cancel" : {
+
+    },
     "Changes to this policy" : {
 
     },
@@ -107,7 +119,13 @@
     "Confirm invoice:" : {
 
     },
+    "Connected" : {
+
+    },
     "Contacting Us" : {
+
+    },
+    "Continue" : {
 
     },
     "copied!" : {
@@ -131,13 +149,22 @@
     "disconnect and clear all data" : {
 
     },
+    "Disconnected" : {
+
+    },
     "Done" : {
+
+    },
+    "Double tap to switch currency display" : {
 
     },
     "enter" : {
 
     },
     "enter connection secret" : {
+
+    },
+    "Error" : {
 
     },
     "Failed to connect to your wallet" : {
@@ -191,10 +218,16 @@
     "lightning invoice" : {
 
     },
+    "Loading..." : {
+
+    },
     "logout" : {
 
     },
     "logout?" : {
+
+    },
+    "Max" : {
 
     },
     "OK" : {
@@ -212,7 +245,13 @@
     "paid" : {
 
     },
+    "Paste" : {
+
+    },
     "payment hash" : {
+
+    },
+    "Pending" : {
 
     },
     "Please enter a real number for the amount" : {
@@ -254,6 +293,12 @@
     "Sat amount must be a number between 1 and 5,000,000" : {
 
     },
+    "sats" : {
+
+    },
+    "Scan" : {
+
+    },
     "scan QR" : {
 
     },
@@ -287,7 +332,13 @@
     "support avocadough" : {
 
     },
+    "Syncing" : {
+
+    },
     "system" : {
+
+    },
+    "Tap to reveal" : {
 
     },
     "Technical basics" : {
