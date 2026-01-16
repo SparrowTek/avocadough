@@ -8,6 +8,7 @@
 import SwiftUI
 import SwiftData
 
+/*
 struct TransactionsView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(WalletState.self) private var state
@@ -121,3 +122,4 @@ fileprivate struct TransactionCell: View {
         .environment(AppState())
         .environment(WalletState(parentState: .init()))
 }
+*/

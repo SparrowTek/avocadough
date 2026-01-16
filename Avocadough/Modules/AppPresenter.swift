@@ -22,8 +22,7 @@ struct AppPresenter: View {
             case .config:
                 ConfigView()
             case .wallet:
-                WalletPresenter()
-                    .environment(state.walletState)
+                MainTabView()
             }
         }
         .onOpenURL()

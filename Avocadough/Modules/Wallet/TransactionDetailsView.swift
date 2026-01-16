@@ -75,16 +75,16 @@ fileprivate struct TransactionDetailSection: View {
     }
 }
 
-#Preview(traits: .sampleTransactions) {
-    @Previewable @Query var transactions: [Transaction]
-    
-    TransactionsView()
-        .environment(AppState())
-        .environment(WalletState(parentState: .init()))
-        .sheet(isPresented: .constant(true)) {
-            TransactionDetailsView(transaction: transactions.first!)
-                .presentationDragIndicator(.visible)
-                .presentationDetents([.medium])
-                .environment(WalletState(parentState: .init()))
-        }
-}
+//#Preview(traits: .sampleTransactions) {
+//    @Previewable @Query var transactions: [Transaction]
+//    
+//    TransactionsView()
+//        .environment(AppState())
+//        .environment(WalletState(parentState: .init()))
+//        .sheet(isPresented: .constant(true)) {
+//            TransactionDetailsView(transaction: transactions.first!)
+//                .presentationDragIndicator(.visible)
+//                .presentationDetents([.medium])
+//                .environment(WalletState(parentState: .init()))
+//        }
+//}

@@ -12,14 +12,12 @@ import SwiftUI
 @MainActor
 class WalletState {
     enum Sheet: Identifiable {
-        case settings
         case send
         case receive
         case open(Transaction)
-        
+
         var id: Int {
             switch self {
-            case .settings: 0
             case .send: 1
             case .receive: 2
             case .open: 3
@@ -37,8 +35,6 @@ class WalletState {
     
     private unowned let parentState: AppState
     
-    @ObservationIgnored
-    lazy var settingsState = SettingsState(parentState: self)
     @ObservationIgnored
     lazy var sendState = SendState(parentState: self)
     @ObservationIgnored

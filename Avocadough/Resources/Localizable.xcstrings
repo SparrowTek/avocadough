@@ -32,7 +32,10 @@
     "1 SAT" : {
 
     },
-    "about" : {
+    "About" : {
+
+    },
+    "Activity" : {
 
     },
     "amount" : {
@@ -45,6 +48,12 @@
 
     },
     "Analytics" : {
+
+    },
+    "Appearance" : {
+
+    },
+    "Are you sure you want to disconnect?" : {
 
     },
     "Attribution" : {
@@ -113,6 +122,9 @@
     "color scheme" : {
 
     },
+    "Color Scheme" : {
+
+    },
     "confirm" : {
 
     },
@@ -140,13 +152,19 @@
     "dark" : {
 
     },
+    "Dark" : {
+
+    },
     "dark mode tint" : {
 
     },
     "description" : {
 
     },
-    "disconnect and clear all data" : {
+    "Disconnect" : {
+
+    },
+    "Disconnect and Clear Data" : {
 
     },
     "Disconnected" : {
@@ -182,6 +200,9 @@
     "for e.g. who is sending this payment?" : {
 
     },
+    "General" : {
+
+    },
     "go" : {
 
     },
@@ -212,6 +233,9 @@
     "light" : {
 
     },
+    "Light" : {
+
+    },
     "light mode tint" : {
 
     },
@@ -221,13 +245,16 @@
     "Loading..." : {
 
     },
-    "logout" : {
-
-    },
-    "logout?" : {
-
-    },
     "Max" : {
+
+    },
+    "No Results" : {
+
+    },
+    "No Transactions" : {
+
+    },
+    "No Transactions Yet" : {
 
     },
     "OK" : {
@@ -260,7 +287,7 @@
     "Please select an amount less than or equal to your current Sat balance" : {
 
     },
-    "poor network connection" : {
+    "Poor network connection" : {
 
     },
     "preimage" : {
@@ -269,16 +296,19 @@
     "preparing your wallet" : {
 
     },
-    "privacy" : {
+    "Privacy" : {
 
     },
     "Privacy Policy" : {
 
     },
-    "receive" : {
+    "Receive" : {
 
     },
     "received" : {
+
+    },
+    "Recent Activity" : {
 
     },
     "request instant and specific amount payment" : {
@@ -308,6 +338,9 @@
     "send" : {
 
     },
+    "Send" : {
+
+    },
     "send BTC" : {
 
     },
@@ -317,7 +350,7 @@
     "sent" : {
 
     },
-    "settings" : {
+    "Settings" : {
 
     },
     "settled at" : {
@@ -332,10 +365,16 @@
     "support avocadough" : {
 
     },
+    "Support Avocadough" : {
+
+    },
     "Syncing" : {
 
     },
     "system" : {
+
+    },
+    "System" : {
 
     },
     "Tap to reveal" : {
@@ -344,19 +383,13 @@
     "Technical basics" : {
 
     },
-    "The currect NWC wallet connection does not have permission to make an invoice" : {
-
-    },
-    "The currect NWC wallet connection does not have permission to see transaction data" : {
-
-    },
-    "The currect NWC wallet connection does not have permission to send sats" : {
+    "The current NWC wallet connection does not have permission to make an invoice" : {
 
     },
     "The current NWC wallet connection does not have permission to see your balance" : {
 
     },
-    "there is no transaction history available" : {
+    "The current NWC wallet connection does not have permission to send sats" : {
 
     },
     "There was a problem confirming your payment. Please try again later" : {
@@ -368,7 +401,19 @@
     "This policy applies to all information collected or submitted on Avocadough’s website and our apps for iPhone and any other devices and platforms." : {
 
     },
+    "This will remove your wallet connection and all local data." : {
+
+    },
+    "Transaction" : {
+
+    },
+    "Try a different search term" : {
+
+    },
     "waiting for payment..." : {
+
+    },
+    "Wallet" : {
 
     },
     "We comply with the California Online Privacy Protection Act. We therefore will not distribute your personal information to outside parties without your consent." : {
@@ -381,6 +426,12 @@
 
     },
     "Your Consent" : {
+
+    },
+    "Your recent transactions will appear here" : {
+
+    },
+    "Your transaction history will appear here" : {
 
     }
   },
