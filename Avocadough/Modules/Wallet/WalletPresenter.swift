@@ -69,23 +69,15 @@ private struct WalletView: View {
 
                 // Balance Card
                 BalanceCard {
-                    VStack(spacing: DesignTokens.Spacing.sm) {
-                        Text((wallet?.balance.millisatsToSats ?? 0).currency)
-                            .font(DesignTokens.Typography.amountLarge)
-                            .foregroundStyle(Color.ds.textPrimary)
-                            .redacted(reason: redacted ? .placeholder : .invalidated)
-                            .contentShape(Rectangle())
-                            .onTapGesture(perform: tappedBalance)
-
-                        Text("sats")
-                            .font(DesignTokens.Typography.headline)
-                            .foregroundStyle(Color.ds.textSecondary)
-
-                        if let btcPrice = state.btcPrice {
-                            Text("≈ \(btcPrice.amount.asDollars(for: wallet?.balance.millisatsToSats ?? 0) ?? "")")
-                                .font(DesignTokens.Typography.title3)
-                                .foregroundStyle(Color.ds.textTertiary)
-                                .redacted(reason: redactDollarText ? .placeholder : .invalidated)
+                    AmountDisplay(
+                        sats: wallet?.balance.millisatsToSats ?? 0,
+                        btcPrice: state.btcPrice?.priceAsDouble,
+                        isHidden: false,
+                        isLoading: redacted && wallet == nil,
+                        size: .large
+                    ) {
+                        if redacted {
+                            tappedBalance()
                         }
                     }
                     .frame(maxWidth: .infinity)
@@ -182,6 +174,7 @@ private struct NetworkStatusBanner: View {
 private struct RecentActivitySection: View {
     @Environment(WalletState.self) private var state
     @Query(sort: \Transaction.createdAt, order: .reverse) private var transactions: [Transaction]
+    @State private var hasAppeared = false
 
     private var recentTransactions: [Transaction] {
         Array(transactions.prefix(5))
@@ -207,14 +200,25 @@ private struct RecentActivitySection: View {
                 .padding(.horizontal, DesignTokens.Spacing.md)
             } else {
                 VStack(spacing: DesignTokens.Spacing.sm) {
-                    ForEach(recentTransactions) { transaction in
+                    ForEach(Array(recentTransactions.enumerated()), id: \.element.id) { index, transaction in
                         RecentTransactionRow(transaction: transaction)
                             .onTapGesture {
                                 state.sheet = .open(transaction)
                             }
+                            .opacity(hasAppeared ? 1 : 0)
+                            .offset(y: hasAppeared ? 0 : 20)
+                            .animation(
+                                DesignTokens.Animation.smooth.delay(Double(index) * 0.05),
+                                value: hasAppeared
+                            )
                     }
                 }
                 .padding(.horizontal, DesignTokens.Spacing.md)
+            }
+        }
+        .onAppear {
+            if !hasAppeared {
+                hasAppeared = true
             }
         }
     }

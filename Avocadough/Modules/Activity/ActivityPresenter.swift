@@ -46,7 +46,7 @@ struct ActivityPresenter: View {
 // MARK: - Activity Content
 
 private struct ActivityContent: View {
-    @Environment(WalletState.self) private var state
+    @Environment(ActivityState.self) private var state
     @Binding var searchText: String
     @Binding var selectedFilter: TransactionFilter
     @Binding var requestInProgress: Bool
@@ -136,7 +136,7 @@ private struct ActivityContent: View {
     }
 
     private func refresh() async {
-        state.refresh()
+        await state.refresh()
     }
 }
 
@@ -188,16 +188,19 @@ private struct FilterPill: View {
 // MARK: - Transaction List View
 
 private struct TransactionListView: View {
-    @Environment(WalletState.self) private var state
+    @Environment(ActivityState.self) private var state
     let groupedTransactions: [(String, [Transaction])]
     @Binding var requestInProgress: Bool
+    @State private var hasAppeared = false
 
     var body: some View {
         ScrollView {
             LazyVStack(spacing: DesignTokens.Spacing.md, pinnedViews: [.sectionHeaders]) {
-                ForEach(groupedTransactions, id: \.0) { section, transactions in
+                ForEach(Array(groupedTransactions.enumerated()), id: \.element.0) { sectionIndex, sectionData in
+                    let (section, transactions) = sectionData
                     Section {
-                        ForEach(transactions) { transaction in
+                        ForEach(Array(transactions.enumerated()), id: \.element.id) { rowIndex, transaction in
+                            let globalIndex = sectionIndex * 10 + rowIndex
                             ActivityTransactionRow(transaction: transaction)
                                 .onTapGesture {
                                     state.sheet = .open(transaction)
@@ -205,6 +208,12 @@ private struct TransactionListView: View {
                                 .onAppear {
                                     checkIfAtBottomAndFetchMore(transaction)
                                 }
+                                .opacity(hasAppeared ? 1 : 0)
+                                .offset(y: hasAppeared ? 0 : 15)
+                                .animation(
+                                    DesignTokens.Animation.smooth.delay(Double(min(globalIndex, 10)) * 0.03),
+                                    value: hasAppeared
+                                )
                         }
                     } header: {
                         SectionHeader(title: section)
@@ -221,6 +230,11 @@ private struct TransactionListView: View {
                 }
             }
             .padding(.horizontal, DesignTokens.Spacing.md)
+        }
+        .onAppear {
+            if !hasAppeared {
+                hasAppeared = true
+            }
         }
     }
 
@@ -339,7 +353,10 @@ private extension Date {
 // MARK: - Preview
 
 #Preview(traits: .sampleTransactions) {
+    @Previewable @State var state = AppState()
+    
     ActivityPresenter()
-        .environment(AppState())
-        .environment(WalletState(parentState: .init()))
+        .environment(state)
+        .environment(state.walletState)
+        .environment(state.activityState)
 }

@@ -27,4 +27,12 @@ class ActivityState {
     init(parentState: AppState) {
         self.parentState = parentState
     }
+    
+    func refresh() async {
+        parentState.refresh()
+    }
+    
+    func getMoreTransactions() {
+        parentState.getMoreTransactions()
+    }
 }

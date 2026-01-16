@@ -90,6 +90,14 @@ public class AppState {
         walletState.btcPrice = price
     }
     
+    func refresh() {
+        walletState.refresh()
+    }
+    
+    func getMoreTransactions() {
+        walletState.getMoreTransactions()
+    }
+    
     func logout(error: LocalizedStringKey? = nil) {
         triggerLogout.toggle()
         setupState.errorMessage = error

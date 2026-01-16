@@ -4,9 +4,6 @@
     "" : {
 
     },
-    ":" : {
-
-    },
     "%@ sats" : {
 
     },
@@ -107,6 +104,9 @@
     "Color Scheme" : {
 
     },
+    "Completed" : {
+
+    },
     "confirm" : {
 
     },
@@ -174,9 +174,6 @@
 
     },
     "failed to initialize NWC wallet connection" : {
-
-    },
-    "fees paid" : {
 
     },
     "General" : {
@@ -254,9 +251,6 @@
     "Paste" : {
 
     },
-    "payment hash" : {
-
-    },
     "Payment Received!" : {
 
     },
@@ -270,9 +264,6 @@
 
     },
     "Poor network connection" : {
-
-    },
-    "preimage" : {
 
     },
     "preparing your wallet" : {
@@ -336,9 +327,6 @@
 
     },
     "Settings" : {
-
-    },
-    "settled at" : {
 
     },
     "Slide to Send" : {
