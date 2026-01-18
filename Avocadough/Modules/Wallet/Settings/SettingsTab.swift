@@ -168,5 +168,5 @@ private struct SettingsRow: View {
     @Previewable @State var state = AppState()
     
     SettingsTab()
-        .environment(state.settingsState)
+        .environment(state.walletState.settingsState)
 }

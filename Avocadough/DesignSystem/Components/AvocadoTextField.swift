@@ -189,36 +189,6 @@ struct AvocadoTextField: View {
     }
 }
 
-// MARK: - Search Field
-
-/// A specialized text field for search functionality
-struct AvocadoSearchField: View {
-    @Binding var text: String
-    let placeholder: String
-    let onSubmit: (() -> Void)?
-
-    init(
-        text: Binding<String>,
-        placeholder: String = "Search",
-        onSubmit: (() -> Void)? = nil
-    ) {
-        self._text = text
-        self.placeholder = placeholder
-        self.onSubmit = onSubmit
-    }
-
-    var body: some View {
-        AvocadoTextField(
-            text: $text,
-            placeholder: placeholder,
-            icon: "magnifyingglass",
-            keyboardType: .default,
-            autocapitalization: .never,
-            onSubmit: onSubmit
-        )
-    }
-}
-
 // MARK: - Invoice/Address Field
 
 /// A specialized text field for Lightning addresses and invoices
@@ -384,9 +354,4 @@ struct AmountTextField: View {
         onScan: {}
     )
     .padding()
-}
-
-#Preview("Search Field") {
-    AvocadoSearchField(text: .constant(""))
-        .padding()
 }

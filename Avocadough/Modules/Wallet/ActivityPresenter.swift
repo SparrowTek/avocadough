@@ -14,42 +14,10 @@ enum TransactionFilter: String, CaseIterable {
     case sent = "Sent"
 }
 
-// MARK: - ActivityTab
-
-struct ActivityPresenter: View {
-    @Environment(ActivityState.self) private var state
-    @State private var searchText = ""
+struct ActivityList: View {
+    @Environment(WalletState.self) private var state
     @State private var selectedFilter: TransactionFilter = .all
-    @State private var requestInProgress = false
-
-    var body: some View {
-        @Bindable var state = state
-
-        NavigationStack {
-            ActivityContent(
-                searchText: $searchText,
-                selectedFilter: $selectedFilter,
-                requestInProgress: $requestInProgress
-            )
-            .sheet(item: $state.sheet) {
-                switch $0 {
-                case .open(let transaction):
-                    TransactionDetailsView(transaction: transaction)
-                        .presentationDragIndicator(.visible)
-                        .presentationDetents([.medium])
-                }
-            }
-        }
-    }
-}
-
-// MARK: - Activity Content
-
-private struct ActivityContent: View {
-    @Environment(ActivityState.self) private var state
-    @Binding var searchText: String
-    @Binding var selectedFilter: TransactionFilter
-    @Binding var requestInProgress: Bool
+    @State private var requestInProgress: Bool = false
     @Query(sort: \Transaction.createdAt, order: .reverse) private var allTransactions: [Transaction]
 
     private var filteredTransactions: [Transaction] {
@@ -63,15 +31,6 @@ private struct ActivityContent: View {
             result = result.filter { $0.transactionType == .incoming }
         case .sent:
             result = result.filter { $0.transactionType == .outgoing }
-        }
-
-        // Apply search filter
-        if !searchText.isEmpty {
-            result = result.filter { transaction in
-                let description = transaction.transactionDescription?.lowercased() ?? ""
-                let amount = String(transaction.amount.millisatsToSats)
-                return description.contains(searchText.lowercased()) || amount.contains(searchText)
-            }
         }
 
         return result
@@ -94,11 +53,7 @@ private struct ActivityContent: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            // Search Bar
-            AvocadoSearchField(text: $searchText, placeholder: "Search transactions")
-                .padding(.horizontal, DesignTokens.Spacing.md)
-                .padding(.vertical, DesignTokens.Spacing.sm)
-
+            
             // Filter Pills
             FilterPillsView(selectedFilter: $selectedFilter)
                 .padding(.horizontal, DesignTokens.Spacing.md)
@@ -114,10 +69,8 @@ private struct ActivityContent: View {
                 Spacer()
                 EmptyStateView(
                     icon: "bolt.slash.fill",
-                    title: searchText.isEmpty ? "No Transactions" : "No Results",
-                    message: searchText.isEmpty
-                        ? "Your transaction history will appear here"
-                        : "Try a different search term"
+                    title: "No Transactions",
+                    message: "Your transaction history will appear here"
                 )
                 Spacer()
             } else {
@@ -127,16 +80,15 @@ private struct ActivityContent: View {
                 )
             }
         }
+        .padding(.top, 32)
         .fullScreenColorView()
         .navigationTitle("Activity")
-        .refreshable {
-            await refresh()
-        }
+        .refreshable { refresh() }
         .syncTransactionData(requestInProgress: $requestInProgress)
     }
 
-    private func refresh() async {
-        await state.refresh()
+    private func refresh() {
+        state.refresh()
     }
 }
 
@@ -188,7 +140,7 @@ private struct FilterPill: View {
 // MARK: - Transaction List View
 
 private struct TransactionListView: View {
-    @Environment(ActivityState.self) private var state
+    @Environment(WalletState.self) private var state
     let groupedTransactions: [(String, [Transaction])]
     @Binding var requestInProgress: Bool
     @State private var hasAppeared = false
@@ -202,9 +154,6 @@ private struct TransactionListView: View {
                         ForEach(Array(transactions.enumerated()), id: \.element.id) { rowIndex, transaction in
                             let globalIndex = sectionIndex * 10 + rowIndex
                             ActivityTransactionRow(transaction: transaction)
-                                .onTapGesture {
-                                    state.sheet = .open(transaction)
-                                }
                                 .onAppear {
                                     checkIfAtBottomAndFetchMore(transaction)
                                 }
@@ -266,6 +215,7 @@ private struct SectionHeader: View {
 // MARK: - Activity Transaction Row
 
 private struct ActivityTransactionRow: View {
+    @Environment(WalletState.self) private var state
     let transaction: Transaction
     @State private var tapTrigger = false
 
@@ -287,41 +237,44 @@ private struct ActivityTransactionRow: View {
     }
 
     var body: some View {
-        AvocadoCard(style: .standard, padding: DesignTokens.Spacing.md) {
-            HStack(spacing: DesignTokens.Spacing.md) {
-                // Icon
-                Image(systemName: displayType.icon)
-                    .font(.system(size: 16, weight: .semibold))
+        HStack(spacing: DesignTokens.Spacing.md) {
+            // Icon
+            Image(systemName: displayType.icon)
+                .font(.system(size: 16, weight: .semibold))
+                .foregroundStyle(displayType.color)
+                .frame(width: 36, height: 36)
+                .background(displayType.color.opacity(0.15))
+                .clipShape(Circle())
+            
+            // Details
+            VStack(alignment: .leading, spacing: DesignTokens.Spacing.xs) {
+                Text("\(displayType.prefix)\(transaction.amount.millisatsToSats.currency)")
+                    .font(DesignTokens.Typography.amountRow)
                     .foregroundStyle(displayType.color)
-                    .frame(width: 36, height: 36)
-                    .background(displayType.color.opacity(0.15))
-                    .clipShape(Circle())
-
-                // Details
-                VStack(alignment: .leading, spacing: DesignTokens.Spacing.xs) {
-                    Text("\(displayType.prefix)\(transaction.amount.millisatsToSats.currency)")
-                        .font(DesignTokens.Typography.amountRow)
-                        .foregroundStyle(displayType.color)
-
-                    Text(transactionDisplayText)
-                        .font(DesignTokens.Typography.subheadline)
-                        .foregroundStyle(Color.ds.textSecondary)
-                        .lineLimit(1)
-                }
-
-                Spacer()
-
-                // Timestamp
-                VStack(alignment: .trailing, spacing: DesignTokens.Spacing.xs) {
-                    Text(formattedTime)
-                        .font(DesignTokens.Typography.caption)
-                        .foregroundStyle(Color.ds.textTertiary)
-                }
-
-                Image(systemName: "chevron.right")
-                    .font(.system(size: 12, weight: .semibold))
+                
+                Text(transactionDisplayText)
+                    .font(DesignTokens.Typography.subheadline)
+                    .foregroundStyle(Color.ds.textSecondary)
+                    .lineLimit(1)
+            }
+            
+            Spacer()
+            
+            // Timestamp
+            VStack(alignment: .trailing, spacing: DesignTokens.Spacing.xs) {
+                Text(formattedTime)
+                    .font(DesignTokens.Typography.caption)
                     .foregroundStyle(Color.ds.textTertiary)
             }
+            
+            Image(systemName: "chevron.right")
+                .font(.system(size: 12, weight: .semibold))
+                .foregroundStyle(Color.ds.textTertiary)
+        }
+        .avocadogeCard(style: .standard, padding: DesignTokens.Spacing.md)
+        .contentShape(Rectangle())
+        .onTapGesture {
+            state.sheet = .open(transaction)
         }
         .sensoryFeedback(AppHaptics.buttonTap, trigger: tapTrigger)
     }
@@ -354,9 +307,13 @@ private extension Date {
 
 #Preview(traits: .sampleTransactions) {
     @Previewable @State var state = AppState()
+    @Previewable @State var isPresented = true
     
-    ActivityPresenter()
-        .environment(state)
-        .environment(state.walletState)
-        .environment(state.activityState)
+    Text("")
+        .sheet(isPresented: $isPresented) {
+            ActivityList()
+                .environment(state)
+                .environment(state.walletState)
+                .presentationDragIndicator(.visible)
+        }
 }

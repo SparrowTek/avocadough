@@ -15,12 +15,16 @@ class WalletState {
         case send
         case receive
         case open(Transaction)
+        case settings
+        case moreActivity
 
         var id: Int {
             switch self {
             case .send: 1
             case .receive: 2
             case .open: 3
+            case .settings: 4
+            case .moreActivity: 5
             }
         }
     }
@@ -39,6 +43,8 @@ class WalletState {
     lazy var sendState = SendState(parentState: self)
     @ObservationIgnored
     lazy var receiveState = ReceiveState(parentState: self)
+    @ObservationIgnored
+    lazy var settingsState = SettingsState(parentState: self)
     
     
     init(parentState: AppState) {

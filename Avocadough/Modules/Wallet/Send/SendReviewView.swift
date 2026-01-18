@@ -40,26 +40,25 @@ struct SendReviewView: View {
             }
 
             // Recipient card
-            AvocadoCard(style: .elevated) {
-                VStack(alignment: .leading, spacing: DesignTokens.Spacing.sm) {
-                    Text("Sending to")
-                        .font(DesignTokens.Typography.caption)
-                        .foregroundStyle(Color.ds.textTertiary)
-
-                    HStack(spacing: DesignTokens.Spacing.sm) {
-                        Image(systemName: "bolt.fill")
-                            .foregroundStyle(DesignTokens.Colors.Accent.primary)
-
-                        Text(recipient)
-                            .font(DesignTokens.Typography.headline)
-                            .foregroundStyle(Color.ds.textPrimary)
-                            .lineLimit(1)
-                            .truncationMode(.middle)
-                    }
+            VStack(alignment: .leading, spacing: DesignTokens.Spacing.sm) {
+                Text("Sending to")
+                    .font(DesignTokens.Typography.caption)
+                    .foregroundStyle(Color.ds.textTertiary)
+                
+                HStack(spacing: DesignTokens.Spacing.sm) {
+                    Image(systemName: "bolt.fill")
+                        .foregroundStyle(DesignTokens.Colors.Accent.primary)
+                    
+                    Text(recipient)
+                        .font(DesignTokens.Typography.headline)
+                        .foregroundStyle(Color.ds.textPrimary)
+                        .lineLimit(1)
+                        .truncationMode(.middle)
                 }
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(DesignTokens.Spacing.md)
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(DesignTokens.Spacing.md)
+            .avocadogeCard(style: .elevated)
             .padding(.horizontal, DesignTokens.Spacing.md)
 
             Spacer()

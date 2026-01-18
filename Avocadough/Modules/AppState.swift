@@ -20,30 +20,7 @@ public class AppState {
         var id: Int { rawValue }
     }
     
-    enum Tab: Int, CaseIterable {
-        case wallet
-        case activity
-        case settings
-
-        var title: LocalizedStringKey {
-            switch self {
-            case .wallet: "Wallet"
-            case .activity: "Activity"
-            case .settings: "Settings"
-            }
-        }
-
-        var icon: String {
-            switch self {
-            case .wallet: "bitcoinsign.circle.fill"
-            case .activity: "list.bullet.rectangle.portrait.fill"
-            case .settings: "gearshape.fill"
-            }
-        }
-    }
-    
     var route: Route = .setup
-    var selectedTab: AppState.Tab = .wallet
     var triggerDataSync = false
     var triggerLogout = false
     
@@ -51,10 +28,6 @@ public class AppState {
     lazy var walletState = WalletState(parentState: self)
     @ObservationIgnored
     lazy var setupState = SetupState(parentState: self)
-    @ObservationIgnored
-    lazy var settingsState = SettingsState(parentState: self)
-    @ObservationIgnored
-    lazy var activityState = ActivityState(parentState: self)
     
     func onOpenURL(_ url: URL) async {
         guard url.scheme == "avocadough" else { return }
@@ -88,14 +61,6 @@ public class AppState {
     
     func savePrice(_ price: BTCPrice?) {
         walletState.btcPrice = price
-    }
-    
-    func refresh() {
-        walletState.refresh()
-    }
-    
-    func getMoreTransactions() {
-        walletState.getMoreTransactions()
     }
     
     func logout(error: LocalizedStringKey? = nil) {

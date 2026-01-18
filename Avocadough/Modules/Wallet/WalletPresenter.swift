@@ -30,6 +30,13 @@ struct WalletPresenter: View {
                         TransactionDetailsView(transaction: transaction)
                             .presentationDragIndicator(.visible)
                             .presentationDetents([.medium])
+                    case .settings:
+                        SettingsPresenter()
+                            .environment(state.settingsState)
+                            .presentationDragIndicator(.visible)
+                    case .moreActivity:
+                        ActivityList()
+                            .presentationDragIndicator(.visible)
                     }
                 }
                 .alert($state.errorMessage)
@@ -107,14 +114,8 @@ private struct WalletView: View {
         .navigationBarTitleDisplayMode(.large)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
-                HStack(spacing: 2) {
-                    Image(systemName: "bolt.fill")
-                        .foregroundStyle(Color.yellow)
-                    Image(systemName: "bolt.fill")
-                        .foregroundStyle(Color.yellow)
-                }
+                Button("", systemImage: "slider.horizontal.3", action: openSettings)
             }
-            .sharedBackgroundVisibility(.hidden)
         }
         .refreshable { await refresh() }
         .syncTransactionData(requestInProgress: $requestInProgress)
@@ -147,6 +148,10 @@ private struct WalletView: View {
         } else {
             state.errorMessage = "The current NWC wallet connection does not have permission to make an invoice"
         }
+    }
+    
+    private func openSettings() {
+        state.sheet = .settings
     }
 
     private func refresh() async {
@@ -189,6 +194,9 @@ private struct RecentActivitySection: View {
                     .foregroundStyle(Color.ds.textPrimary)
 
                 Spacer()
+                
+                Button("See more", action: seeMoreActivity)
+                    .foregroundStyle(.accentPrimary)
             }
             .padding(.horizontal, DesignTokens.Spacing.md)
 
@@ -203,9 +211,6 @@ private struct RecentActivitySection: View {
                 VStack(spacing: DesignTokens.Spacing.sm) {
                     ForEach(Array(recentTransactions.enumerated()), id: \.element.id) { index, transaction in
                         RecentTransactionRow(transaction: transaction)
-                            .onTapGesture {
-                                state.sheet = .open(transaction)
-                            }
                             .opacity(hasAppeared ? 1 : 0)
                             .offset(y: hasAppeared ? 0 : 20)
                             .animation(
@@ -223,11 +228,16 @@ private struct RecentActivitySection: View {
             }
         }
     }
+    
+    private func seeMoreActivity() {
+        state.sheet = .moreActivity
+    }
 }
 
 // MARK: - Recent Transaction Row
 
 private struct RecentTransactionRow: View {
+    @Environment(WalletState.self) private var state
     let transaction: Transaction
     @State private var tapTrigger = false
 
@@ -243,36 +253,39 @@ private struct RecentTransactionRow: View {
     }
 
     var body: some View {
-        AvocadoCard(style: .standard, padding: DesignTokens.Spacing.md) {
-            HStack(spacing: DesignTokens.Spacing.md) {
-                // Icon
-                Image(systemName: displayType.icon)
-                    .font(.system(size: 16, weight: .semibold))
+        HStack(spacing: DesignTokens.Spacing.md) {
+            // Icon
+            Image(systemName: displayType.icon)
+                .font(.system(size: 16, weight: .semibold))
+                .foregroundStyle(displayType.color)
+                .frame(width: 36, height: 36)
+                .background(displayType.color.opacity(0.15))
+                .clipShape(Circle())
+            
+            // Details
+            VStack(alignment: .leading, spacing: DesignTokens.Spacing.xs) {
+                Text("\(displayType.prefix)\(transaction.amount.millisatsToSats.currency)")
+                    .font(DesignTokens.Typography.amountRow)
                     .foregroundStyle(displayType.color)
-                    .frame(width: 36, height: 36)
-                    .background(displayType.color.opacity(0.15))
-                    .clipShape(Circle())
-
-                // Details
-                VStack(alignment: .leading, spacing: DesignTokens.Spacing.xs) {
-                    Text("\(displayType.prefix)\(transaction.amount.millisatsToSats.currency)")
-                        .font(DesignTokens.Typography.amountRow)
-                        .foregroundStyle(displayType.color)
-
-                    Text(transactionDisplayText)
-                        .font(DesignTokens.Typography.subheadline)
-                        .foregroundStyle(Color.ds.textSecondary)
-                        .lineLimit(1)
-                }
-
-                Spacer()
-
-                // Timestamp
-                Text(transaction.createdAt?.invoiceFormat ?? "")
-                    .font(DesignTokens.Typography.caption)
-                    .foregroundStyle(Color.ds.textTertiary)
+                
+                Text(transactionDisplayText)
+                    .font(DesignTokens.Typography.subheadline)
+                    .foregroundStyle(Color.ds.textSecondary)
+                    .lineLimit(1)
             }
+            
+            Spacer()
+            
+            // Timestamp
+            Text(transaction.createdAt?.invoiceFormat ?? "")
+                .font(DesignTokens.Typography.caption)
+                .foregroundStyle(Color.ds.textTertiary)
         }
+        .contentShape(Rectangle())
+        .onTapGesture {
+            state.sheet = .open(transaction)
+        }
+        .avocadogeCard(style: .standard, padding: DesignTokens.Spacing.md)
         .sensoryFeedback(AppHaptics.buttonTap, trigger: tapTrigger)
     }
 }

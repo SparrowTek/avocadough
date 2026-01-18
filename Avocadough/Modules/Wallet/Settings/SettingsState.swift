@@ -17,21 +17,20 @@ class SettingsState {
         case support
     }
     
-    private unowned let parentState: AppState
+    private unowned let parentState: WalletState
     var path: [SettingsState.NavigationLink] = []
     var presentNWCDisconnectDialog = false
     
-    init(parentState: AppState) {
+    init(parentState: WalletState) {
         self.parentState = parentState
     }
     
     func disconnectNWC() {
-        // TODO: figure this out now that parent state is not walletState anymore
-//        parentState.disconnectNWC()
+        parentState.disconnectNWC()
     }
     
     func routeToSupport() {
         path = []
-//        parentState.routeToSupport()
+        parentState.routeToSupport()
     }
 }

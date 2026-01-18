@@ -100,55 +100,54 @@ struct TransactionDetailsView: View {
     // MARK: - Details Card
 
     private var detailsCard: some View {
-        AvocadoCard(style: .elevated) {
-            VStack(spacing: 0) {
-                // Date
-                if let settledAt = transaction.settledAt {
-                    detailRow(
-                        title: "Date",
-                        value: formatDate(settledAt),
-                        showDivider: true
-                    )
-                }
-
-                // Description
-                if let description = transaction.transactionDescription, !description.isEmpty {
-                    detailRow(
-                        title: "Description",
-                        value: description,
-                        showDivider: true
-                    )
-                }
-
-                // Fees
-                if transaction.feesPaid > 0 {
-                    detailRow(
-                        title: "Fees Paid",
-                        value: "\(transaction.feesPaid.millisatsToSats) sats",
-                        showDivider: true
-                    )
-                }
-
-                // Payment Hash (copyable)
-                copyableDetailRow(
-                    title: "Payment Hash",
-                    value: transaction.paymentHash,
-                    fieldId: "hash",
-                    showDivider: transaction.preimage != nil
+        VStack(spacing: 0) {
+            // Date
+            if let settledAt = transaction.settledAt {
+                detailRow(
+                    title: "Date",
+                    value: formatDate(settledAt),
+                    showDivider: true
                 )
-
-                // Preimage (copyable)
-                if let preimage = transaction.preimage {
-                    copyableDetailRow(
-                        title: "Preimage",
-                        value: preimage,
-                        fieldId: "preimage",
-                        showDivider: false
-                    )
-                }
             }
-            .padding(DesignTokens.Spacing.md)
+            
+            // Description
+            if let description = transaction.transactionDescription, !description.isEmpty {
+                detailRow(
+                    title: "Description",
+                    value: description,
+                    showDivider: true
+                )
+            }
+            
+            // Fees
+            if transaction.feesPaid > 0 {
+                detailRow(
+                    title: "Fees Paid",
+                    value: "\(transaction.feesPaid.millisatsToSats) sats",
+                    showDivider: true
+                )
+            }
+            
+            // Payment Hash (copyable)
+            copyableDetailRow(
+                title: "Payment Hash",
+                value: transaction.paymentHash,
+                fieldId: "hash",
+                showDivider: transaction.preimage != nil
+            )
+            
+            // Preimage (copyable)
+            if let preimage = transaction.preimage {
+                copyableDetailRow(
+                    title: "Preimage",
+                    value: preimage,
+                    fieldId: "preimage",
+                    showDivider: false
+                )
+            }
         }
+        .padding(DesignTokens.Spacing.md)
+        .avocadogeCard(style: .elevated)
     }
 
     private func detailRow(title: String, value: String, showDivider: Bool) -> some View {

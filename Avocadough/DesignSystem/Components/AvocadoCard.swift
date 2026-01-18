@@ -20,83 +20,11 @@ enum AvocadoCardStyle {
     case transparent
 }
 
-// MARK: - AvocadoCard
-
-/// A versatile card container component for grouping related content
-struct AvocadoCard<Content: View>: View {
+struct AvocardViewModifier: ViewModifier {
     let style: AvocadoCardStyle
     let padding: CGFloat
     let cornerRadius: CGFloat
-    let isInteractive: Bool
-    let action: (() -> Void)?
-    @ViewBuilder let content: () -> Content
-
-    @State private var isPressed = false
-    @State private var tapTrigger = false
-
-    init(
-        style: AvocadoCardStyle = .standard,
-        padding: CGFloat = DesignTokens.Spacing.md,
-        cornerRadius: CGFloat = DesignTokens.Radius.lg,
-        isInteractive: Bool = false,
-        action: (() -> Void)? = nil,
-        @ViewBuilder content: @escaping () -> Content
-    ) {
-        self.style = style
-        self.padding = padding
-        self.cornerRadius = cornerRadius
-        self.isInteractive = isInteractive || action != nil
-        self.action = action
-        self.content = content
-    }
-
-    var body: some View {
-        Group {
-            if isInteractive {
-                Button(action: handleTap) {
-                    cardContent
-                }
-                .buttonStyle(.plain)
-                .sensoryFeedback(AppHaptics.buttonTap, trigger: tapTrigger)
-            } else {
-                cardContent
-            }
-        }
-    }
-
-    private var cardContent: some View {
-        content()
-            .padding(padding)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .background(backgroundColor)
-            .clipShape(RoundedRectangle(cornerRadius: cornerRadius))
-            .overlay(overlayBorder)
-            .shadow(
-                color: shadowProperties.color,
-                radius: shadowProperties.radius,
-                x: shadowProperties.x,
-                y: shadowProperties.y
-            )
-            .scaleEffect(isInteractive && isPressed ? 0.98 : 1)
-            .animation(DesignTokens.Animation.snappy, value: isPressed)
-            .simultaneousGesture(
-                DragGesture(minimumDistance: 0)
-                    .onChanged { _ in
-                        if isInteractive { isPressed = true }
-                    }
-                    .onEnded { _ in
-                        isPressed = false
-                    }
-            )
-    }
-
-    private func handleTap() {
-        tapTrigger.toggle()
-        action?()
-    }
-
-    // MARK: - Style Properties
-
+    
     private var backgroundColor: Color {
         switch style {
         case .standard:
@@ -111,7 +39,7 @@ struct AvocadoCard<Content: View>: View {
             .clear
         }
     }
-
+    
     @ViewBuilder
     private var overlayBorder: some View {
         if style == .outlined {
@@ -127,6 +55,27 @@ struct AvocadoCard<Content: View>: View {
         default:
             DesignTokens.Shadow.none
         }
+    }
+    
+    func body(content: Content) -> some View {
+        content
+            .padding(padding)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(backgroundColor)
+            .clipShape(RoundedRectangle(cornerRadius: cornerRadius))
+            .overlay(overlayBorder)
+            .shadow(
+                color: shadowProperties.color,
+                radius: shadowProperties.radius,
+                x: shadowProperties.x,
+                y: shadowProperties.y
+            )
+    }
+}
+
+extension View {
+    func avocadogeCard(style: AvocadoCardStyle = .standard, padding: CGFloat = DesignTokens.Spacing.md, cornerRadius: CGFloat = DesignTokens.Radius.lg) -> some View {
+        modifier(AvocardViewModifier(style: style, padding: padding, cornerRadius: cornerRadius))
     }
 }
 
@@ -148,13 +97,14 @@ struct BalanceCard<Content: View>: View {
     }
 
     var body: some View {
-        AvocadoCard(style: .elevated, padding: DesignTokens.Spacing.lg) {
+        ZStack {
             if isLoading {
                 shimmerContent
             } else {
                 content()
             }
         }
+        .avocadogeCard(style: .elevated, padding: DesignTokens.Spacing.lg)
     }
 
     private var shimmerContent: some View {
@@ -239,36 +189,37 @@ struct TransactionCard: View {
     }
 
     var body: some View {
-        AvocadoCard(style: .standard, padding: DesignTokens.Spacing.md, action: action) {
-            HStack(spacing: DesignTokens.Spacing.md) {
-                // Icon
-                Image(systemName: type.icon)
-                    .font(.system(size: 16, weight: .semibold))
+        HStack(spacing: DesignTokens.Spacing.md) {
+            // Icon
+            Image(systemName: type.icon)
+                .font(.system(size: 16, weight: .semibold))
+                .foregroundStyle(type.color)
+                .frame(width: 36, height: 36)
+                .background(type.color.opacity(0.15))
+                .clipShape(Circle())
+            
+            // Details
+            VStack(alignment: .leading, spacing: DesignTokens.Spacing.xs) {
+                Text("\(type.prefix)\(amount)")
+                    .font(DesignTokens.Typography.amountRow)
                     .foregroundStyle(type.color)
-                    .frame(width: 36, height: 36)
-                    .background(type.color.opacity(0.15))
-                    .clipShape(Circle())
-
-                // Details
-                VStack(alignment: .leading, spacing: DesignTokens.Spacing.xs) {
-                    Text("\(type.prefix)\(amount)")
-                        .font(DesignTokens.Typography.amountRow)
-                        .foregroundStyle(type.color)
-
-                    Text(description)
-                        .font(DesignTokens.Typography.subheadline)
-                        .foregroundStyle(Color.ds.textSecondary)
-                        .lineLimit(1)
-                }
-
-                Spacer()
-
-                // Timestamp
-                Text(timestamp)
-                    .font(DesignTokens.Typography.caption)
-                    .foregroundStyle(Color.ds.textTertiary)
+                
+                Text(description)
+                    .font(DesignTokens.Typography.subheadline)
+                    .foregroundStyle(Color.ds.textSecondary)
+                    .lineLimit(1)
             }
+            
+            Spacer()
+            
+            // Timestamp
+            Text(timestamp)
+                .font(DesignTokens.Typography.caption)
+                .foregroundStyle(Color.ds.textTertiary)
         }
+        .avocadogeCard(style: .standard, padding: DesignTokens.Spacing.md)
+        .contentShape(Rectangle())
+        .onTapGesture { action?() }
     }
 }
 
@@ -300,36 +251,37 @@ struct InfoCard: View {
     }
 
     var body: some View {
-        AvocadoCard(style: style, action: action) {
-            HStack(spacing: DesignTokens.Spacing.md) {
-                Image(systemName: icon)
-                    .font(.system(size: 20, weight: .semibold))
-                    .foregroundStyle(iconColor)
-                    .frame(width: 40, height: 40)
-                    .background(iconColor.opacity(0.15))
-                    .clipShape(RoundedRectangle(cornerRadius: DesignTokens.Radius.sm))
-
-                VStack(alignment: .leading, spacing: DesignTokens.Spacing.xs) {
-                    Text(title)
-                        .font(DesignTokens.Typography.headline)
-                        .foregroundStyle(Color.ds.textPrimary)
-
-                    if let subtitle {
-                        Text(subtitle)
-                            .font(DesignTokens.Typography.subheadline)
-                            .foregroundStyle(Color.ds.textSecondary)
-                    }
-                }
-
-                Spacer()
-
-                if action != nil {
-                    Image(systemName: "chevron.right")
-                        .font(.system(size: 14, weight: .semibold))
-                        .foregroundStyle(Color.ds.textTertiary)
+        HStack(spacing: DesignTokens.Spacing.md) {
+            Image(systemName: icon)
+                .font(.system(size: 20, weight: .semibold))
+                .foregroundStyle(iconColor)
+                .frame(width: 40, height: 40)
+                .background(iconColor.opacity(0.15))
+                .clipShape(RoundedRectangle(cornerRadius: DesignTokens.Radius.sm))
+            
+            VStack(alignment: .leading, spacing: DesignTokens.Spacing.xs) {
+                Text(title)
+                    .font(DesignTokens.Typography.headline)
+                    .foregroundStyle(Color.ds.textPrimary)
+                
+                if let subtitle {
+                    Text(subtitle)
+                        .font(DesignTokens.Typography.subheadline)
+                        .foregroundStyle(Color.ds.textSecondary)
                 }
             }
+            
+            Spacer()
+            
+            if action != nil {
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundStyle(Color.ds.textTertiary)
+            }
         }
+        .avocadogeCard(style: style)
+        .contentShape(Rectangle())
+        .onTapGesture { action?() }
     }
 }
 
@@ -338,26 +290,18 @@ struct InfoCard: View {
 #Preview("Card Styles") {
     ScrollView {
         VStack(spacing: DesignTokens.Spacing.md) {
-            AvocadoCard(style: .standard) {
-                Text("Standard Card")
-            }
-
-            AvocadoCard(style: .elevated) {
-                Text("Elevated Card")
-            }
-
-            AvocadoCard(style: .outlined) {
-                Text("Outlined Card")
-            }
-
-            AvocadoCard(style: .filled) {
-                Text("Filled Card")
-                    .foregroundStyle(.white)
-            }
-
-            AvocadoCard(style: .standard, isInteractive: true) {
-                Text("Interactive Card")
-            }
+            Text("Standard Card")
+                .avocadogeCard(style: .standard)
+            
+            Text("Elevated Card")
+                .avocadogeCard(style: .elevated)
+            
+            Text("Outlined Card")
+                .avocadogeCard(style: .outlined)
+            
+            Text("Filled Card")
+                .foregroundStyle(.white)
+                .avocadogeCard(style: .filled)
         }
         .padding()
     }
