@@ -169,7 +169,7 @@ private struct SettingsRow: View {
 #Preview {
     @Previewable @State var state = AppState()
     
-    SettingsTab()
+    SettingsPresenter()
         .environment(state.walletState.settingsState)
 }
 
