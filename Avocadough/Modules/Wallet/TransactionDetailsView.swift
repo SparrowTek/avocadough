@@ -31,15 +31,24 @@ struct TransactionDetailsView: View {
     }
 
     var body: some View {
-        VStack(spacing: DesignTokens.Spacing.lg) {
-            // Header with icon and amount
-            headerSection
-
-            // Details card
-            detailsCard
-
-            Spacer()
+        ZStack(alignment: .topLeading) {
+            Image(systemName: displayType.icon)
+                .font(.system(size: 32, weight: .semibold))
+                .foregroundStyle(displayType.color)
+                .frame(width: 64, height: 64)
+                .background(displayType.color.opacity(0.15))
+                .clipShape(Circle())
+            VStack(spacing: DesignTokens.Spacing.lg) {
+                // Header with icon and amount
+                headerSection
+                
+                // Details card
+                detailsCard
+                
+                Spacer()
+            }
         }
+        .padding(.top, 32)
         .padding(DesignTokens.Spacing.md)
         .fullScreenColorView()
         .sensoryFeedback(AppHaptics.copy, trigger: copyTrigger)
@@ -49,31 +58,23 @@ struct TransactionDetailsView: View {
 
     private var headerSection: some View {
         VStack(spacing: DesignTokens.Spacing.md) {
-            // Icon
-            Image(systemName: displayType.icon)
-                .font(.system(size: 32, weight: .semibold))
-                .foregroundStyle(displayType.color)
-                .frame(width: 64, height: 64)
-                .background(displayType.color.opacity(0.15))
-                .clipShape(Circle())
-
             // Amount
             VStack(spacing: DesignTokens.Spacing.xs) {
                 Text("\(displayType.prefix)\(formattedAmount)")
                     .font(DesignTokens.Typography.amountLarge)
                     .foregroundStyle(displayType.color)
-
+                
                 Text("sats")
                     .font(DesignTokens.Typography.headline)
                     .foregroundStyle(Color.ds.textSecondary)
-
+                
                 if let fiat = fiatAmount {
                     Text("≈ \(fiat)")
                         .font(DesignTokens.Typography.title3)
                         .foregroundStyle(Color.ds.textTertiary)
                 }
             }
-
+            
             // Status badge
             statusBadge
         }
