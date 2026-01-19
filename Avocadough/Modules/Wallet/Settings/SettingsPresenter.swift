@@ -325,8 +325,9 @@ struct SupportView: View {
             Avocadoguh is a free and open source application. Please consider sending some sats to help support ongoing development efforts.
             """)
             
-            Button("support", systemImage: "bitcoinsign", action: routeToSupportApp)
-                .buttonStyle(.avocadough)
+            AvocadoButton("Support", icon: "bitcoinsign", variant: .secondary, size: .large) {
+                routeToSupportApp()
+            }
             
             Spacer()
         }
