@@ -251,6 +251,9 @@
     "Need a wallet?" : {
 
     },
+    "No Results" : {
+
+    },
     "No Transactions" : {
 
     },
@@ -420,6 +423,9 @@
 
     },
     "Transaction" : {
+
+    },
+    "Try a different search term" : {
 
     },
     "Use your camera to scan" : {

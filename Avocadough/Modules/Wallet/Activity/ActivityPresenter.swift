@@ -14,10 +14,26 @@ enum TransactionFilter: String, CaseIterable {
     case sent = "Sent"
 }
 
-struct ActivityList: View {
-    @Environment(WalletState.self) private var state
+struct ActivityPresenter: View {
+    @Environment(ActivityState.self) private var state
+    
+    var body: some View {
+        @Bindable var state = state
+        
+        NavigationStack(path: $state.path) {
+            ActivityList()
+                .navigationDestination(for: Transaction.self) {
+                    TransactionDetailsView(transaction: $0)
+                }
+        }
+    }
+}
+
+fileprivate struct ActivityList: View {
+    @Environment(ActivityState.self) private var state
     @State private var selectedFilter: TransactionFilter = .all
     @State private var requestInProgress: Bool = false
+    @State private var searchText = ""
     @Query(sort: \Transaction.createdAt, order: .reverse) private var allTransactions: [Transaction]
 
     private var filteredTransactions: [Transaction] {
@@ -33,6 +49,14 @@ struct ActivityList: View {
             result = result.filter { $0.transactionType == .outgoing }
         }
 
+        if !searchText.isEmpty {
+            result = result.filter { transaction in
+                let description = transaction.transactionDescription?.lowercased() ?? ""
+                let amount = String(transaction.amount.millisatsToSats)
+                return description.contains(searchText.lowercased()) || amount.contains(searchText)
+            }
+        }
+        
         return result
     }
 
@@ -69,14 +93,17 @@ struct ActivityList: View {
                 Spacer()
                 EmptyStateView(
                     icon: "bolt.slash.fill",
-                    title: "No Transactions",
-                    message: "Your transaction history will appear here"
+                    title: searchText.isEmpty ? "No Transactions" : "No Results",
+                    message: searchText.isEmpty
+                    ? "Your transaction history will appear here"
+                    : "Try a different search term"
                 )
                 Spacer()
             } else {
                 TransactionListView(
                     groupedTransactions: groupedTransactions,
-                    requestInProgress: $requestInProgress
+                    requestInProgress: $requestInProgress,
+                    searchText: $searchText
                 )
             }
         }
@@ -85,6 +112,7 @@ struct ActivityList: View {
         .navigationTitle("Activity")
         .refreshable { refresh() }
         .syncTransactionData(requestInProgress: $requestInProgress)
+        .toolbarTitleDisplayMode(.inline)
     }
 
     private func refresh() {
@@ -140,9 +168,10 @@ private struct FilterPill: View {
 // MARK: - Transaction List View
 
 private struct TransactionListView: View {
-    @Environment(WalletState.self) private var state
+    @Environment(ActivityState.self) private var state
     let groupedTransactions: [(String, [Transaction])]
     @Binding var requestInProgress: Bool
+    @Binding var searchText: String
     @State private var hasAppeared = false
 
     var body: some View {
@@ -180,6 +209,7 @@ private struct TransactionListView: View {
             }
             .padding(.horizontal, DesignTokens.Spacing.md)
         }
+        .searchable(text: $searchText)
         .onAppear {
             if !hasAppeared {
                 hasAppeared = true
@@ -215,7 +245,7 @@ private struct SectionHeader: View {
 // MARK: - Activity Transaction Row
 
 private struct ActivityTransactionRow: View {
-    @Environment(WalletState.self) private var state
+    @Environment(ActivityState.self) private var state
     let transaction: Transaction
     @State private var tapTrigger = false
 
@@ -273,9 +303,7 @@ private struct ActivityTransactionRow: View {
         }
         .avocadogeCard(style: .standard, padding: DesignTokens.Spacing.md)
         .contentShape(Rectangle())
-        .onTapGesture {
-            state.sheet = .open(transaction)
-        }
+        .onTapGesture { state.openTransaction(transaction) }
         .sensoryFeedback(AppHaptics.buttonTap, trigger: tapTrigger)
     }
 }
@@ -311,9 +339,9 @@ private extension Date {
     
     Text("")
         .sheet(isPresented: $isPresented) {
-            ActivityList()
+            ActivityPresenter()
                 .environment(state)
-                .environment(state.walletState)
+                .environment(state.walletState.activityState)
                 .presentationDragIndicator(.visible)
         }
 }
