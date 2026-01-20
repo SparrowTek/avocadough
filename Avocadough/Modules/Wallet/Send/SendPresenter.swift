@@ -62,8 +62,10 @@ fileprivate struct SendView: View {
                     .textFieldStyle(.roundedBorder)
                     .autocorrectionDisabled()
                 
-                Button("go", action: continueWithInput)
-                    .buttonStyle(.bordered)
+                AvocadoButton("go") {
+                    continueWithInput()
+                }
+                .frame(width: 100)
             }
             .padding()
             
