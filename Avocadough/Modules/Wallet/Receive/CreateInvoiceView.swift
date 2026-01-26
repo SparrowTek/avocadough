@@ -65,7 +65,8 @@ struct CreateInvoiceView: View {
         isLoading = true
         defer { isLoading = false }
 
-        guard let invoice = try? await nwc.makeInvoice(amount: amount, description: nil, descriptionHash: nil, expiry: nil) else {
+        let amountMillisats = amount * 1000
+        guard let invoice = try? await nwc.makeInvoice(amount: amountMillisats, description: nil, descriptionHash: nil, expiry: nil) else {
             state.errorMessage = "Failed to create invoice. Please try again."
             return
         }
