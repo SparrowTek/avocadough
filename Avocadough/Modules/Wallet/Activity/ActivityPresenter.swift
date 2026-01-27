@@ -341,6 +341,7 @@ private extension Date {
         .sheet(isPresented: $isPresented) {
             ActivityPresenter()
                 .environment(state)
+                .environment(state.walletState)
                 .environment(state.walletState.activityState)
                 .presentationDragIndicator(.visible)
         }

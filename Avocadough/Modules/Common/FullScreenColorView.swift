@@ -10,7 +10,7 @@ import SwiftUI
 fileprivate struct FullScreenColorView: ViewModifier {
     func body(content: Content) -> some View {
         ZStack {
-            Color.primaryBackground
+            Color.backgroundPrimary
                 .ignoresSafeArea()
             content
         }
