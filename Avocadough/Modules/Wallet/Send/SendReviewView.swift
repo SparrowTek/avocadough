@@ -17,6 +17,7 @@ struct SendReviewView: View {
 
     @State private var isLoading = false
     @State private var errorMessage: LocalizedStringKey?
+    @State private var performPaymentTrigger = PlainTaskTrigger()
 
     var body: some View {
         VStack(spacing: DesignTokens.Spacing.xl) {
@@ -78,6 +79,7 @@ struct SendReviewView: View {
         .navigationTitle("Review Payment")
         .navigationBarTitleDisplayMode(.inline)
         .alert($errorMessage)
+        .task($performPaymentTrigger) { await performPayment() }
     }
 
     // MARK: - Formatting
@@ -103,9 +105,7 @@ struct SendReviewView: View {
     // MARK: - Actions
 
     private func sendPayment() {
-        Task {
-            await performPayment()
-        }
+        performPaymentTrigger.trigger()
     }
 
     private func performPayment() async {
@@ -116,9 +116,15 @@ struct SendReviewView: View {
             let _ = try await nwc.payInvoice(invoicePR)
             state.showPaymentSuccess(amount: amount, recipient: recipient)
         } catch {
-            // Payment may have succeeded even if we got an error (e.g., timeout waiting for response).
-            // Treat this as success and let the transaction sync show the actual status.
-            state.showPaymentSuccess(amount: amount, recipient: recipient)
+            if case .nostrKit(let inner) = error,
+               let relayError = inner as? RelayError,
+               case .timeout = relayError {
+                // Request was published but no response received in time.
+                // Payment may have succeeded, so show success and let transaction sync resolve.
+                state.showPaymentSuccess(amount: amount, recipient: recipient)
+            } else {
+                errorMessage = "Payment failed. Please check your wallet and try again."
+            }
         }
     }
 }
