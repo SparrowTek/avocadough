@@ -43,10 +43,6 @@ class SendState {
     init(parentState: WalletState) {
         self.parentState = parentState
     }
-    
-    func cancel() {
-        clearPathAndCloseSheet()
-    }
 
     func navigateToReview(recipient: String, amount: UInt64, invoicePR: String) {
         path.append(.reviewPayment(recipient: recipient, amount: amount, invoicePR: invoicePR))

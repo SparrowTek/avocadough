@@ -49,11 +49,6 @@ struct SendDetailsView: View {
         .fullScreenColorView()
         .navigationTitle("Send")
         .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-            ToolbarItem(placement: .topBarLeading) {
-                Button("Cancel", action: cancel)
-            }
-        }
         .alert($errorMessage)
         .task($generateInvoiceTrigger) { await generateInvoiceAndContinue() }
     }
@@ -89,10 +84,6 @@ struct SendDetailsView: View {
     }
 
     // MARK: - Actions
-
-    private func cancel() {
-        state.cancel()
-    }
 
     private func triggerGenerateInvoice() {
         generateInvoiceTrigger.trigger()
