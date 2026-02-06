@@ -5,6 +5,10 @@
 //  Created by Thomas Rademaker on 4/12/25.
 //
 
+struct LNURLpResponse: Codable, Sendable {
+    let callback: String
+}
+
 struct GeneratedInvoice: Codable, Sendable {
     public let pr: String?
     public let routes: [String]?
