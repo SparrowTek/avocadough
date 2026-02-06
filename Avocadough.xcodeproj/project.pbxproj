@@ -13,7 +13,6 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		6C9B15342EF8A3EF00A9DD60 /* Services */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = Services; sourceTree = "<group>"; };
 		6CDD4BE82B25210E00C6C324 /* Avocadough.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Avocadough.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -50,7 +49,6 @@
 		6CDD4BDF2B25210E00C6C324 = {
 			isa = PBXGroup;
 			children = (
-				6C9B15342EF8A3EF00A9DD60 /* Services */,
 				6CD88DC22CF191EA00E9B653 /* ci_scripts */,
 				6CD88DC02CF191E700E9B653 /* Configurations */,
 				6CD88D932CF191E400E9B653 /* Avocadough */,
