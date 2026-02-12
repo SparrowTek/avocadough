@@ -336,7 +336,7 @@ struct SupportView: View {
     }
     
     private func routeToSupportApp() {
-        state.routeToSupport()
+//        state.routeToSupport()
         guard let url = URL(string: "https://avocadough.xyz/support-project") else { return }
         openURL(url)
     }
