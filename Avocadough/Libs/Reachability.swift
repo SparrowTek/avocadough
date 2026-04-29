@@ -44,7 +44,6 @@ class Reachability {
     }
 }
 
-#warning("Can this be done without adding @preconcurrency")
 @MainActor
 private struct ReachabilityKey: @preconcurrency EnvironmentKey {
     static let defaultValue = Reachability()
