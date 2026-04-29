@@ -1,6 +1,15 @@
 {
-  "originHash" : "f2e8987c6cece4952f2b1d9ec48751ffd6ea0e76b5891fe302f5d97a99be5138",
+  "originHash" : "a8c68834a44a87ce538a9aacbd1a2cbf7740164fa76ad6a608a3ac152ed86c48",
   "pins" : [
+    {
+      "identity" : "corenostr",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/SparrowTek/CoreNostr.git",
+      "state" : {
+        "revision" : "7ec32d4b6a0956b1b1927ca62bacdfd835ee8782",
+        "version" : "3.0.0"
+      }
+    },
     {
       "identity" : "ldk-swift",
       "kind" : "remoteSourceControl",
@@ -8,6 +17,15 @@
       "state" : {
         "revision" : "b36f37fc216ae83eb8fdc625ae3c85ea4158a7d6",
         "version" : "0.0.125"
+      }
+    },
+    {
+      "identity" : "nostrkit",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/SparrowTek/NostrKit",
+      "state" : {
+        "revision" : "c15a2e8fbf9c98f9cbe2b569f1f8731a810c747a",
+        "version" : "3.0.0"
       }
     },
     {

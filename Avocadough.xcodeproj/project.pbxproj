@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		6C66BB6B2FA243BC00F0756B /* NostrKit in Frameworks */ = {isa = PBXBuildFile; productRef = 6C66BB6A2FA243BC00F0756B /* NostrKit */; };
+		6C66BE3E2FA2931D00F0756B /* NostrKit in Frameworks */ = {isa = PBXBuildFile; productRef = 6C66BE3D2FA2931D00F0756B /* NostrKit */; };
 		6C73E5F82B3F0F3B0073C816 /* Vault in Frameworks */ = {isa = PBXBuildFile; productRef = 6C73E5F72B3F0F3B0073C816 /* Vault */; };
 		6CECC8AA2C5C03E7000F688B /* LightningDevKit in Frameworks */ = {isa = PBXBuildFile; productRef = 6CECC8A92C5C03E7000F688B /* LightningDevKit */; };
 /* End PBXBuildFile section */
@@ -39,6 +40,7 @@
 			files = (
 				6C66BB6B2FA243BC00F0756B /* NostrKit in Frameworks */,
 				6C73E5F82B3F0F3B0073C816 /* Vault in Frameworks */,
+				6C66BE3E2FA2931D00F0756B /* NostrKit in Frameworks */,
 				6CECC8AA2C5C03E7000F688B /* LightningDevKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -87,6 +89,7 @@
 				6C73E5F72B3F0F3B0073C816 /* Vault */,
 				6CECC8A92C5C03E7000F688B /* LightningDevKit */,
 				6C66BB6A2FA243BC00F0756B /* NostrKit */,
+				6C66BE3D2FA2931D00F0756B /* NostrKit */,
 			);
 			productName = Boostz;
 			productReference = 6CDD4BE82B25210E00C6C324 /* Avocadough.app */;
@@ -119,7 +122,7 @@
 			packageReferences = (
 				6C73E5F62B3F0F3B0073C816 /* XCRemoteSwiftPackageReference "Vault" */,
 				6CECC8A82C5C03E7000F688B /* XCRemoteSwiftPackageReference "ldk-swift" */,
-				6C66BB692FA243BC00F0756B /* XCLocalSwiftPackageReference "../../../Nostr/NostrKit" */,
+				6C66BE3C2FA2931D00F0756B /* XCRemoteSwiftPackageReference "NostrKit" */,
 			);
 			productRefGroup = 6CDD4BE92B25210E00C6C324 /* Products */;
 			projectDirPath = "";
@@ -375,14 +378,15 @@
 		};
 /* End XCConfigurationList section */
 
-/* Begin XCLocalSwiftPackageReference section */
-		6C66BB692FA243BC00F0756B /* XCLocalSwiftPackageReference "../../../Nostr/NostrKit" */ = {
-			isa = XCLocalSwiftPackageReference;
-			relativePath = ../../../Nostr/NostrKit;
-		};
-/* End XCLocalSwiftPackageReference section */
-
 /* Begin XCRemoteSwiftPackageReference section */
+		6C66BE3C2FA2931D00F0756B /* XCRemoteSwiftPackageReference "NostrKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/SparrowTek/NostrKit";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 3.0.0;
+			};
+		};
 		6C73E5F62B3F0F3B0073C816 /* XCRemoteSwiftPackageReference "Vault" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/SparrowTek/Vault";
@@ -404,6 +408,11 @@
 /* Begin XCSwiftPackageProductDependency section */
 		6C66BB6A2FA243BC00F0756B /* NostrKit */ = {
 			isa = XCSwiftPackageProductDependency;
+			productName = NostrKit;
+		};
+		6C66BE3D2FA2931D00F0756B /* NostrKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6C66BE3C2FA2931D00F0756B /* XCRemoteSwiftPackageReference "NostrKit" */;
 			productName = NostrKit;
 		};
 		6C73E5F72B3F0F3B0073C816 /* Vault */ = {
