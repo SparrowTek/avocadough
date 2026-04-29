@@ -49,7 +49,7 @@ fileprivate struct SyncTransactionData: ViewModifier {
 
     private func saveTransactions(_ nwcTransactions: [NWCTransaction]) throws {
         for nwcTransaction in nwcTransactions {
-            let transaction = Transaction(nwcTransaction: nwcTransaction)
+            guard let transaction = Transaction(nwcTransaction: nwcTransaction) else { continue }
             context.insert(transaction)
         }
 

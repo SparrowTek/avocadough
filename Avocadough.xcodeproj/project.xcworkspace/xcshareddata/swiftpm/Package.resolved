@@ -1,31 +1,13 @@
 {
-  "originHash" : "6fdc76d043ebb8a85f879a131b43da8fad196591fbf545579994113a6f10999d",
+  "originHash" : "f2e8987c6cece4952f2b1d9ec48751ffd6ea0e76b5891fe302f5d97a99be5138",
   "pins" : [
-    {
-      "identity" : "corenostr",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/SparrowTek/CoreNostr.git",
-      "state" : {
-        "branch" : "main",
-        "revision" : "05bd75f06ba311801125b8c440ae5f1643708a26"
-      }
-    },
     {
       "identity" : "ldk-swift",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/lightningdevkit/ldk-swift",
       "state" : {
-        "revision" : "e3fa435166527b1089787fd4ab0ce398849fb916",
-        "version" : "0.0.123"
-      }
-    },
-    {
-      "identity" : "nostrkit",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/SparrowTek/NostrKit",
-      "state" : {
-        "branch" : "main",
-        "revision" : "75fbc12df948fda7a572c1209835bc0fa2bcba45"
+        "revision" : "b36f37fc216ae83eb8fdc625ae3c85ea4158a7d6",
+        "version" : "0.0.125"
       }
     },
     {
@@ -33,8 +15,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-asn1.git",
       "state" : {
-        "revision" : "810496cf121e525d660cd0ea89a758740476b85f",
-        "version" : "1.5.1"
+        "revision" : "eb50cbd14606a9161cbc5d452f18797c90ef0bab",
+        "version" : "1.7.0"
       }
     },
     {
@@ -51,8 +33,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/21-DOT-DEV/swift-secp256k1",
       "state" : {
-        "revision" : "8c62aba8a3011c9bcea232e5ee007fb0b34a15e2",
-        "version" : "0.21.1"
+        "revision" : "cfab52e538683557259302c39ef25df60226eb30",
+        "version" : "0.23.1"
       }
     },
     {

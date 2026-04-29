@@ -13,10 +13,11 @@ enum AvocadoughTransactionType: String, Codable {
     case incoming
     case outgoing
 
-    init(transactionType: NWCTransactionType) {
-        self = switch transactionType {
-        case .incoming: .incoming
-        case .outgoing: .outgoing
+    init?(transactionType: NWCTransactionType) {
+        switch transactionType {
+        case .incoming: self = .incoming
+        case .outgoing: self = .outgoing
+        case .unknown: return nil
         }
     }
 
@@ -94,20 +95,21 @@ extension AvocadoughSchema {
             self.settledAt = settledAt
         }
 
-        /// Initialize from NostrKit's NWCTransaction
-        init(nwcTransaction: NWCTransaction) {
+        /// Initialize from NostrKit's NWCTransaction.
+        /// Fails when the transaction has no payment hash, since it's required as the unique identifier.
+        init?(nwcTransaction: NWCTransaction) {
+            guard let paymentHash = nwcTransaction.paymentHash else { return nil }
+
             self.transactionType = AvocadoughTransactionType(transactionType: nwcTransaction.type)
             self.invoice = nwcTransaction.invoice
             self.transactionDescription = nwcTransaction.description
             self.descriptionHash = nwcTransaction.descriptionHash
             self.preimage = nwcTransaction.preimage
-            self.paymentHash = nwcTransaction.paymentHash
+            self.paymentHash = paymentHash
 
-            // Convert Int64 amounts to UInt64 (NostrKit uses signed integers)
             self.amount = UInt64(max(0, nwcTransaction.amount))
             self.feesPaid = UInt64(max(0, nwcTransaction.feesPaid ?? 0))
 
-            // Convert TimeInterval (seconds since epoch as Double) to UInt64
             self.createdAt = UInt64(nwcTransaction.createdAt)
             self.expiresAt = nwcTransaction.expiresAt.map { UInt64($0) }
             self.settledAt = nwcTransaction.settledAt.map { UInt64($0) }

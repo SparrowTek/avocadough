@@ -139,7 +139,7 @@ final class NWCWalletProvider: WalletProvider {
                 limit: limit
             )
 
-            return transactions.map { mapTransaction($0) }
+            return transactions.compactMap(mapTransaction)
         } catch {
             throw WalletProviderError.transactionFetchFailed(error.localizedDescription)
         }
@@ -147,23 +147,27 @@ final class NWCWalletProvider: WalletProvider {
 
     // MARK: - Helpers
 
-    private func mapTransaction(_ nwcTransaction: NWCTransaction) -> WalletTransaction {
-        let transactionType: WalletTransaction.TransactionType = {
-            switch nwcTransaction.type {
-            case .incoming: return .incoming
-            case .outgoing: return .outgoing
-            }
-        }()
+    /// Maps an ``NWCTransaction`` into the provider-layer ``WalletTransaction``.
+    /// Returns nil when the transaction can't be represented (missing payment hash or unknown type).
+    private func mapTransaction(_ nwcTransaction: NWCTransaction) -> WalletTransaction? {
+        guard let paymentHash = nwcTransaction.paymentHash else { return nil }
+
+        let transactionType: WalletTransaction.TransactionType
+        switch nwcTransaction.type {
+        case .incoming: transactionType = .incoming
+        case .outgoing: transactionType = .outgoing
+        case .unknown: return nil
+        }
 
         return WalletTransaction(
-            id: nwcTransaction.paymentHash,
+            id: paymentHash,
             type: transactionType,
             amount: UInt64(max(0, nwcTransaction.amount)),
             feesPaid: UInt64(max(0, nwcTransaction.feesPaid ?? 0)),
             description: nwcTransaction.description,
             invoice: nwcTransaction.invoice,
             preimage: nwcTransaction.preimage,
-            paymentHash: nwcTransaction.paymentHash,
+            paymentHash: paymentHash,
             createdAt: Date(timeIntervalSince1970: nwcTransaction.createdAt),
             settledAt: nwcTransaction.settledAt.map { Date(timeIntervalSince1970: $0) }
         )
