@@ -8,6 +8,7 @@
 import SwiftUI
 import SwiftData
 import LightningDevKit
+import NostrKit
 
 struct DisplayInvoiceView: View {
     var invoice: MakeInvoiceResponse
@@ -16,10 +17,15 @@ struct DisplayInvoiceView: View {
     @State private var checkInvoiceTrigger = PlainTaskTrigger()
     @State private var copyInvoiceTrigger = PlainTaskTrigger()
     @Environment(ReceiveState.self) private var state
+    @Environment(\.nwc) private var nwc
     @State private var requestInProgress = false
     @State private var bolt11: Bolt11Invoice?
     @State private var pulsePhase: CGFloat = 0
     @Query private var transactions: [Transaction]
+
+    /// Polling cadence for transaction list while waiting on payment.
+    /// Matches the responsiveness users expect for an incoming Lightning payment without flooding the relay.
+    private static let pollInterval: Duration = .seconds(4)
 
     private var thisTransaction: Transaction? {
         for transaction in transactions {
@@ -67,6 +73,8 @@ struct DisplayInvoiceView: View {
         }
         .task($checkInvoiceTrigger) { await checkInvoiceStatus() }
         .task($copyInvoiceTrigger) { await copyInvoice() }
+        .task(id: isSettled) { await pollForPayment() }
+        .task(id: isSettled) { await observePaymentNotifications() }
         .onAppear {
             setupBolt11()
             startPulseAnimation()
@@ -214,6 +222,33 @@ struct DisplayInvoiceView: View {
 
     private func checkInvoiceStatus() async {
         state.refreshTransactions()
+    }
+
+    /// Polls the wallet for transaction updates while waiting for the invoice to be paid.
+    /// Skipped once `isSettled` flips to true (the `task(id:)` cancels and a new one starts in settled state, which exits immediately).
+    private func pollForPayment() async {
+        guard !isSettled else { return }
+        while !Task.isCancelled {
+            do {
+                try await Task.sleep(for: Self.pollInterval)
+            } catch {
+                return
+            }
+            guard !Task.isCancelled else { return }
+            state.refreshTransactions()
+        }
+    }
+
+    /// Listens for NWC payment-received events and refreshes immediately
+    /// when one fires, giving sub-second updates on wallets that support NIP-47 notifications.
+    private func observePaymentNotifications() async {
+        guard !isSettled else { return }
+        for await event in nwc.events {
+            guard !Task.isCancelled else { return }
+            if event == .paymentReceived {
+                state.refreshTransactions()
+            }
+        }
     }
 
     private func triggerCopyInvoice() {

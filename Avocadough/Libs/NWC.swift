@@ -38,6 +38,14 @@ class NWC {
         storedUri = nil
     }
 
+    /// Real-time wallet events (e.g. payment received/sent).
+    ///
+    /// Wallets that don't support NIP-47 notifications produce no events, so callers
+    /// should also poll as a fallback.
+    var events: AsyncStream<NWCEvent> {
+        walletManager.events
+    }
+
     /// Parse NWC URI and save secret to keychain
     /// - Parameter code: The nostr+walletconnect:// URI string
     /// - Returns: NWCConnection with pubKey, relay, and optional lud16

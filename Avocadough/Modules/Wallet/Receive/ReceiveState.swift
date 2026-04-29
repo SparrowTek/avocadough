@@ -33,6 +33,7 @@ class ReceiveState {
     func doneTapped() {
         parentState.closeSheet()
         path = []
+        refreshTransactions()
     }
 
     func showPaymentReceived(amount: UInt64) {
