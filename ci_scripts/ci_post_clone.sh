@@ -11,6 +11,11 @@ bundle_id_prefix_value=$BUNDLE_ID_PREFIX
 
 config_file_path="../User.xcconfig"
 
+# Trust SwiftPM build tool plugins (e.g. swift-secp256k1's SharedSourcesPlugin)
+# so Xcode Cloud doesn't fail with "Plugin must be enabled before it can be used".
+defaults write com.apple.dt.Xcode IDESkipPackagePluginFingerprintValidatation -bool YES
+defaults write com.apple.dt.Xcode IDESkipMacroFingerprintValidation -bool YES
+
 # Check for the presence of 'user.xcconfig'
 if [ -f "$config_file_path" ]; then
 echo "User.xcconfig exists."
