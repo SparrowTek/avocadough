@@ -8,6 +8,7 @@
 import Foundation
 import SwiftUI
 import LightningDevKit
+import AvocadoughKit
 
 @Observable
 @MainActor
@@ -15,6 +16,7 @@ class SendState {
     enum NavigationLink: Hashable {
         case sendInvoice(Bolt11Invoice)
         case getLightningAddressDetails(String)
+        case resolveIdentity(String)
         case reviewPayment(recipient: String, amount: UInt64, invoicePR: String)
         case paymentSuccess(amount: UInt64, recipient: String)
         case scanQR
@@ -33,6 +35,7 @@ class SendState {
     private unowned let parentState: WalletState
     var path: [SendState.NavigationLink] = []
     var errorMessage: LocalizedStringKey?
+    var resolvedIdentity: PaymentIdentity?
     var btcPrice: Double? {
         parentState.btcPrice?.priceAsDouble
     }
@@ -60,25 +63,36 @@ class SendState {
     }
     
     func continueWithInput(_ lightningInput: String, replaceCurrentPath: Bool = false) {
+        resolvedIdentity = nil
+
         let navigationPath: NavigationLink = if let bolt11 = Bolt11Invoice.fromStr(s: lightningInput).getValue() {
             .sendInvoice(bolt11)
+        } else if case .atIdentifier(let identifier) = PaymentTarget.classify(lightningInput) {
+            .resolveIdentity(identifier)
         } else {
             .getLightningAddressDetails(lightningInput)
         }
-        
+
         if replaceCurrentPath {
             path[path.index(before: path.endIndex)] = navigationPath
         } else {
             path.append(navigationPath)
         }
     }
-    
+
+    func identityResolved(_ identity: PaymentIdentity?, lightningAddress: String) {
+        resolvedIdentity = identity
+        path[path.index(before: path.endIndex)] = .getLightningAddressDetails(lightningAddress)
+    }
+
     private func clearPathAndCloseSheet() {
         path = []
+        resolvedIdentity = nil
         parentState.sheet = nil
     }
     
     func routeToSupport() {
+        resolvedIdentity = nil
         path.append(.getLightningAddressDetails("sparrowtek@getalby.com"))
     }
 }

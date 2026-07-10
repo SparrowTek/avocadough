@@ -20,6 +20,8 @@ struct SendPresenter: View {
                     switch $0 {
                     case .getLightningAddressDetails(let address):
                         SendDetailsView(lightningAddress: address)
+                    case .resolveIdentity(let identifier):
+                        ResolveIdentityView(identifier: identifier)
                     case .sendInvoice(let bolt11):
                         SendConfirmationView(bolt11: bolt11)
                     case .reviewPayment(let recipient, let amount, let invoicePR):
@@ -58,7 +60,7 @@ fileprivate struct SendView: View {
         
         VStack {
             HStack {
-                TextField("invoice, lightning address, or LNURL", text: $lightningInput)
+                TextField("invoice, lightning address, LNURL, or @handle", text: $lightningInput)
                     .textFieldStyle(.roundedBorder)
                     .autocorrectionDisabled()
                 

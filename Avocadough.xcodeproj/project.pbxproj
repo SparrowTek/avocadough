@@ -10,6 +10,7 @@
 		6C66BB6B2FA243BC00F0756B /* NostrKit in Frameworks */ = {isa = PBXBuildFile; productRef = 6C66BB6A2FA243BC00F0756B /* NostrKit */; };
 		6C66BE3E2FA2931D00F0756B /* NostrKit in Frameworks */ = {isa = PBXBuildFile; productRef = 6C66BE3D2FA2931D00F0756B /* NostrKit */; };
 		6C73E5F82B3F0F3B0073C816 /* Vault in Frameworks */ = {isa = PBXBuildFile; productRef = 6C73E5F72B3F0F3B0073C816 /* Vault */; };
+		6CAB10042E1A000100000004 /* AvocadoughKit in Frameworks */ = {isa = PBXBuildFile; productRef = 6CAB10032E1A000100000003 /* AvocadoughKit */; };
 		6CECC8AA2C5C03E7000F688B /* LightningDevKit in Frameworks */ = {isa = PBXBuildFile; productRef = 6CECC8A92C5C03E7000F688B /* LightningDevKit */; };
 /* End PBXBuildFile section */
 
@@ -42,6 +43,7 @@
 				6C73E5F82B3F0F3B0073C816 /* Vault in Frameworks */,
 				6C66BE3E2FA2931D00F0756B /* NostrKit in Frameworks */,
 				6CECC8AA2C5C03E7000F688B /* LightningDevKit in Frameworks */,
+				6CAB10042E1A000100000004 /* AvocadoughKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -90,6 +92,7 @@
 				6CECC8A92C5C03E7000F688B /* LightningDevKit */,
 				6C66BB6A2FA243BC00F0756B /* NostrKit */,
 				6C66BE3D2FA2931D00F0756B /* NostrKit */,
+				6CAB10032E1A000100000003 /* AvocadoughKit */,
 			);
 			productName = Boostz;
 			productReference = 6CDD4BE82B25210E00C6C324 /* Avocadough.app */;
@@ -123,6 +126,8 @@
 				6C73E5F62B3F0F3B0073C816 /* XCRemoteSwiftPackageReference "Vault" */,
 				6CECC8A82C5C03E7000F688B /* XCRemoteSwiftPackageReference "ldk-swift" */,
 				6C66BE3C2FA2931D00F0756B /* XCRemoteSwiftPackageReference "NostrKit" */,
+				6CAB10012E1A000100000001 /* XCLocalSwiftPackageReference "../../../AtProto/CoreATProtocol" */,
+				6CAB10022E1A000100000002 /* XCLocalSwiftPackageReference "../AvocadoughKit" */,
 			);
 			productRefGroup = 6CDD4BE92B25210E00C6C324 /* Products */;
 			projectDirPath = "";
@@ -378,6 +383,17 @@
 		};
 /* End XCConfigurationList section */
 
+/* Begin XCLocalSwiftPackageReference section */
+		6CAB10012E1A000100000001 /* XCLocalSwiftPackageReference "../../../AtProto/CoreATProtocol" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ../../../AtProto/CoreATProtocol;
+		};
+		6CAB10022E1A000100000002 /* XCLocalSwiftPackageReference "../AvocadoughKit" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ../AvocadoughKit;
+		};
+/* End XCLocalSwiftPackageReference section */
+
 /* Begin XCRemoteSwiftPackageReference section */
 		6C66BE3C2FA2931D00F0756B /* XCRemoteSwiftPackageReference "NostrKit" */ = {
 			isa = XCRemoteSwiftPackageReference;
@@ -414,6 +430,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 6C66BE3C2FA2931D00F0756B /* XCRemoteSwiftPackageReference "NostrKit" */;
 			productName = NostrKit;
+		};
+		6CAB10032E1A000100000003 /* AvocadoughKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6CAB10022E1A000100000002 /* XCLocalSwiftPackageReference "../AvocadoughKit" */;
+			productName = AvocadoughKit;
 		};
 		6C73E5F72B3F0F3B0073C816 /* Vault */ = {
 			isa = XCSwiftPackageProductDependency;

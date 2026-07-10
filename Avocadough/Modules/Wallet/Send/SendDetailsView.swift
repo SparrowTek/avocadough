@@ -30,6 +30,10 @@ struct SendDetailsView: View {
         state.btcPrice
     }
 
+    private var recipientDisplayName: String {
+        state.resolvedIdentity?.displayHandle ?? lightningAddress
+    }
+
     var body: some View {
         VStack(spacing: 0) {
             // Recipient header
@@ -69,12 +73,20 @@ struct SendDetailsView: View {
                     .font(DesignTokens.Typography.caption)
                     .foregroundStyle(Color.ds.textTertiary)
 
-                Text(lightningAddress)
+                Text(recipientDisplayName)
                     .font(DesignTokens.Typography.subheadline)
                     .fontWeight(.medium)
                     .foregroundStyle(Color.ds.textPrimary)
                     .lineLimit(1)
                     .truncationMode(.middle)
+
+                if state.resolvedIdentity != nil {
+                    Text(lightningAddress)
+                        .font(DesignTokens.Typography.caption)
+                        .foregroundStyle(Color.ds.textTertiary)
+                        .lineLimit(1)
+                        .truncationMode(.middle)
+                }
             }
 
             Spacer()
@@ -129,7 +141,7 @@ struct SendDetailsView: View {
             }
 
             // Navigate to review screen
-            state.navigateToReview(recipient: lightningAddress, amount: amount, invoicePR: invoicePR)
+            state.navigateToReview(recipient: recipientDisplayName, amount: amount, invoicePR: invoicePR)
         } catch {
             errorMessage = "Failed to create invoice. Please try again."
         }
