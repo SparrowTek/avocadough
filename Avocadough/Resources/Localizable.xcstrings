@@ -20,9 +20,6 @@
         }
       }
     },
-    "%llu sats" : {
-
-    },
     "••••••" : {
 
     },
@@ -122,12 +119,6 @@
     "Completed" : {
 
     },
-    "confirm" : {
-
-    },
-    "Confirm invoice:" : {
-
-    },
     "Connect Your Wallet" : {
 
     },
@@ -174,6 +165,9 @@
 
     },
     "Enter amount to request" : {
+
+    },
+    "Enter an invoice, Lightning address, or LNURL." : {
 
     },
     "Error" : {
@@ -230,6 +224,9 @@
     "invoice, lightning address, or LNURL" : {
 
     },
+    "Invoices without an amount aren't supported yet." : {
+
+    },
     "light" : {
 
     },
@@ -264,6 +261,9 @@
 
     },
     "OK" : {
+
+    },
+    "On-chain bitcoin addresses aren't supported. Ask for a Lightning invoice instead." : {
 
     },
     "or paste connection string" : {
@@ -401,6 +401,12 @@
     "Technical basics" : {
 
     },
+    "That Lightning invoice couldn't be read. Ask for a new one and try again." : {
+
+    },
+    "That Lightning invoice has expired. Ask for a new one and try again." : {
+
+    },
     "The current NWC wallet connection does not have permission to make an invoice" : {
 
     },
@@ -408,9 +414,6 @@
 
     },
     "The current NWC wallet connection does not have permission to send sats" : {
-
-    },
-    "There was a problem confirming your payment. Please try again later" : {
 
     },
     "Third-party links and content" : {
