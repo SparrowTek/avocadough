@@ -33,9 +33,19 @@ class NWC {
     private var storedUri: String?
     var hasConnected = false
     
-    func logout() {
+    /// Tears down the wallet connection and forgets its credentials everywhere they
+    /// live: the connections NostrKit persists in its own keychain service (each one
+    /// carries the client secret) and the app's copy of the secret.
+    func logout() async {
         hasConnected = false
         storedUri = nil
+
+        for connection in walletManager.connections {
+            await walletManager.removeConnection(connection)
+        }
+        await walletManager.disconnect()
+
+        try? await Vault.shared.delete(configuration: .nwcSecret)
     }
 
     /// Real-time wallet events (e.g. payment received/sent).
@@ -49,13 +59,13 @@ class NWC {
     /// Parse NWC URI and save secret to keychain
     /// - Parameter code: The nostr+walletconnect:// URI string
     /// - Returns: NWCConnection with pubKey, relay, and optional lud16
-    func parseWalletCode(_ code: String) throws(NWCError) -> NWCConnection {
+    func parseWalletCode(_ code: String) async throws(NWCError) -> NWCConnection {
         guard let uri = NWCConnectionURI(from: code) else {
             throw .failedToParse
         }
 
         // Save the secret to keychain
-        try saveSecret(uri.secret)
+        try await saveSecret(uri.secret)
 
         // Store the full URI for later connection
         storedUri = code
@@ -78,7 +88,7 @@ class NWC {
     func initializeNWCClient(pubKey: String, relay: String, lud16: String?) async throws(NWCError) {
         // Prevent multiple connections
         guard !hasConnected else { return }
-        guard let secret else { throw .noSecret }
+        guard let secret = await storedSecret() else { throw .noSecret }
 
         // Reconstruct URI from components if we don't have it stored
         let uri = storedUri ?? buildUri(pubKey: pubKey, relay: relay, secret: secret, lud16: lud16)
@@ -124,6 +134,17 @@ class NWC {
         }
     }
 
+    /// Looks up an invoice or payment the wallet knows about.
+    /// - Parameter paymentHash: The payment hash (hex), which identifies both an invoice
+    ///   the wallet issued and a payment it made.
+    func lookupInvoice(paymentHash: String) async throws(NWCError) -> WalletConnectManager.InvoiceLookupResult {
+        do {
+            return try await walletManager.lookupInvoice(paymentHash: paymentHash)
+        } catch {
+            throw .nostrKit(error)
+        }
+    }
+
     /// Create a new invoice
     /// - Parameters:
     ///   - amount: Amount in millisatoshis
@@ -161,9 +182,9 @@ class NWC {
     ///   - from: Start date
     ///   - until: End date
     ///   - limit: Maximum number of transactions
-    ///   - offset: Pagination offset (not supported by NostrKit - ignored)
-    ///   - unpaid: Filter by unpaid status (not supported by NostrKit - ignored)
-    ///   - transactionType: Filter by type (not supported by NostrKit - ignored)
+    ///   - offset: Pagination offset
+    ///   - unpaid: Include unpaid invoices (the wallet's default is to leave them out)
+    ///   - transactionType: Only incoming or only outgoing; `nil` returns both
     /// - Returns: Array of NWCTransaction
     func listTransactions(
         from: Date?,
@@ -177,7 +198,10 @@ class NWC {
             return try await walletManager.listTransactions(
                 from: from,
                 until: until,
-                limit: limit.map { Int($0) }
+                limit: limit.map { Int($0) },
+                offset: offset.map { Int($0) },
+                unpaid: unpaid,
+                type: transactionType
             )
         } catch {
             throw .nostrKit(error)
@@ -186,13 +210,13 @@ class NWC {
 
     // MARK: - Secret Management
 
-    private var secret: String? {
-        try? Vault.getPrivateKey(keychainConfiguration: .nwcSecret)
+    private func storedSecret() async -> String? {
+        try? await Vault.shared.read(configuration: .nwcSecret)
     }
 
-    private func saveSecret(_ secret: String) throws(NWCError) {
+    private func saveSecret(_ secret: String) async throws(NWCError) {
         do {
-            try Vault.savePrivateKey(secret, keychainConfiguration: .nwcSecret)
+            try await Vault.shared.save(secret, configuration: .nwcSecret)
         } catch {
             throw .failedToSaveSecret
         }

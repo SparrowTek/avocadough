@@ -119,13 +119,26 @@ struct SendReviewView: View {
             if case .nostrKit(let inner) = error,
                let relayError = inner as? RelayError,
                case .timeout = relayError {
-                // Request was published but no response received in time.
-                // Payment may have succeeded, so show success and let transaction sync resolve.
-                state.showPaymentSuccess(amount: amount, recipient: recipient)
+                await resolveTimedOutPayment()
             } else {
                 errorMessage = "Payment failed. Please check your wallet and try again."
             }
         }
+    }
+
+    /// The request went out but no response arrived in time, so the outcome is unknown.
+    /// Ask the wallet before deciding: only a payment it reports as failed is shown as
+    /// one. Anything else (settled, still pending, or a wallet that can't look payments
+    /// up) keeps the optimistic path, and transaction sync shows the final state.
+    private func resolveTimedOutPayment() async {
+        guard let paymentHash = DecodedInvoice(invoicePR)?.paymentHash,
+              let payment = try? await nwc.lookupInvoice(paymentHash: paymentHash),
+              payment.state == .failed else {
+            state.showPaymentSuccess(amount: amount, recipient: recipient)
+            return
+        }
+
+        errorMessage = "Payment failed. Please check your wallet and try again."
     }
 }
 

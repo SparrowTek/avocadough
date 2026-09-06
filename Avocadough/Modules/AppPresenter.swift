@@ -27,12 +27,12 @@ struct AppPresenter: View {
             }
         }
         .onOpenURL()
-        .onAppear(perform: determineRoute)
+        .task { await determineRoute() }
         .logoutTracker()
     }
     
-    private func determineRoute() {
-        state.determineRoute()
+    private func determineRoute() async {
+        await state.determineRoute()
     }
 }
 

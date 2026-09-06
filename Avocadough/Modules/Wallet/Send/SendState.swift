@@ -7,13 +7,12 @@
 
 import Foundation
 import SwiftUI
-import LightningDevKit
 
 @Observable
 @MainActor
 class SendState {
     enum NavigationLink: Hashable {
-        case sendInvoice(Bolt11Invoice)
+        case sendInvoice(DecodedInvoice)
         case getLightningAddressDetails(String)
         case reviewPayment(recipient: String, amount: UInt64, invoicePR: String)
         case paymentSuccess(amount: UInt64, recipient: String)
@@ -95,19 +94,19 @@ class SendState {
 
         switch input {
         case .bolt11(let invoice):
-            guard let bolt11 = Bolt11Invoice.fromStr(s: invoice).getValue() else {
+            guard let decoded = DecodedInvoice(invoice) else {
                 errorMessage = "That Lightning invoice couldn't be read. Ask for a new one and try again."
                 return nil
             }
-            guard !bolt11.isExpired() else {
+            guard !decoded.isExpired else {
                 errorMessage = "That Lightning invoice has expired. Ask for a new one and try again."
                 return nil
             }
-            guard let amount = bolt11.amountSats, amount > 0 else {
+            guard let amount = decoded.amountSats, amount > 0 else {
                 errorMessage = "Invoices without an amount aren't supported yet."
                 return nil
             }
-            return .sendInvoice(bolt11)
+            return .sendInvoice(decoded)
         case .recipient(let recipient):
             return .getLightningAddressDetails(recipient)
         case .onChainOnly:

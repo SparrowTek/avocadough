@@ -81,8 +81,8 @@ final class WalletManager {
     }
 
     /// Disconnect a specific wallet
-    func disconnect(type: WalletType) {
-        providers[type]?.disconnect()
+    func disconnect(type: WalletType) async {
+        await providers[type]?.disconnect()
 
         // Switch active wallet if needed
         if activeWalletType == type {
@@ -91,8 +91,10 @@ final class WalletManager {
     }
 
     /// Disconnect all wallets
-    func disconnectAll() {
-        providers.values.forEach { $0.disconnect() }
+    func disconnectAll() async {
+        for provider in providers.values {
+            await provider.disconnect()
+        }
         activeWalletType = nil
     }
 

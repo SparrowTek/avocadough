@@ -173,8 +173,8 @@ protocol WalletProvider: AnyObject, Sendable {
     /// - Parameter connectionString: The connection string (NWC URI, Cashu mint URL, etc.)
     func connect(connectionString: String) async throws
 
-    /// Disconnect from the wallet
-    func disconnect()
+    /// Disconnect from the wallet and forget its credentials
+    func disconnect() async
 
     /// Get the current balance
     /// - Returns: The wallet balance in millisatoshis

@@ -57,11 +57,10 @@ public class AppState {
         walletState.send(input)
     }
     
-    func determineRoute() {
-        do {
-            let _ = try Vault.getPrivateKey(keychainConfiguration: .nwcSecret)
+    func determineRoute() async {
+        if (try? await Vault.shared.read(configuration: .nwcSecret)) != nil {
             route = .config
-        } catch {
+        } else {
             route = .setup
         }
     }
@@ -86,11 +85,12 @@ public class AppState {
         walletState.btcPrice = price
     }
     
+    /// Routes back to setup. The credential and connection teardown runs in
+    /// `LogoutTracker`, which observes `triggerLogout`.
     func logout(error: LocalizedStringKey? = nil) {
         triggerLogout.toggle()
         pendingPaymentInput = nil
         setupState.errorMessage = error
-        try? Vault.deletePrivateKey(keychainConfiguration: .nwcSecret)
         route = .setup
     }
 }

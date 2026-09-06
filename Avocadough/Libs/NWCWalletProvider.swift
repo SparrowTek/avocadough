@@ -33,7 +33,7 @@ final class NWCWalletProvider: WalletProvider {
 
         // Save the secret to keychain
         do {
-            try Vault.savePrivateKey(uri.secret, keychainConfiguration: .nwcSecret)
+            try await Vault.shared.save(uri.secret, configuration: .nwcSecret)
         } catch {
             throw WalletProviderError.connectionFailed("Failed to save credentials")
         }
@@ -59,10 +59,17 @@ final class NWCWalletProvider: WalletProvider {
         }
     }
 
-    func disconnect() {
+    /// Drops the live connection and the copies NostrKit keeps in its own keychain
+    /// service, each of which carries the client secret.
+    func disconnect() async {
         isConnected = false
         storedUri = nil
         connectionInfo = nil
+
+        for connection in walletManager.connections {
+            await walletManager.removeConnection(connection)
+        }
+        await walletManager.disconnect()
     }
 
     // MARK: - Balance
@@ -136,7 +143,8 @@ final class NWCWalletProvider: WalletProvider {
             let transactions = try await walletManager.listTransactions(
                 from: nil,
                 until: nil,
-                limit: limit
+                limit: limit,
+                offset: offset
             )
 
             return transactions.compactMap(mapTransaction)
@@ -177,7 +185,7 @@ final class NWCWalletProvider: WalletProvider {
 
     /// Reconnect using stored credentials
     func reconnect(pubKey: String, relay: String, lud16: String?) async throws {
-        guard let secret = try? Vault.getPrivateKey(keychainConfiguration: .nwcSecret) else {
+        guard let secret = try? await Vault.shared.read(configuration: .nwcSecret) else {
             throw WalletProviderError.invalidCredentials
         }
 

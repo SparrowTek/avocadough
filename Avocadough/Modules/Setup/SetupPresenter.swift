@@ -378,7 +378,7 @@ private struct ConnectWalletView: View {
 
     private func parseWalletCode(_ code: String) async {
         do {
-            let nwcCode = try nwc.parseWalletCode(code)
+            let nwcCode = try await nwc.parseWalletCode(code)
             context.insert(nwcCode)
             try context.save()
 

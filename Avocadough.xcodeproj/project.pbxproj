@@ -526,7 +526,7 @@
 			repositoryURL = "https://github.com/SparrowTek/NostrKit";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 3.0.0;
+				minimumVersion = 5.0.0;
 			};
 		};
 		6C73E5F62B3F0F3B0073C816 /* XCRemoteSwiftPackageReference "Vault" */ = {
@@ -534,7 +534,7 @@
 			repositoryURL = "https://github.com/SparrowTek/Vault";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 1.2.0;
+				minimumVersion = 2.1.0;
 			};
 		};
 		6CECC8A82C5C03E7000F688B /* XCRemoteSwiftPackageReference "ldk-swift" */ = {
