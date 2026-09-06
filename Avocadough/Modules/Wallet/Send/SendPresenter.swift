@@ -21,7 +21,12 @@ struct SendPresenter: View {
                     case .getLightningAddressDetails(let address):
                         SendDetailsView(lightningAddress: address)
                     case .sendInvoice(let bolt11):
-                        SendConfirmationView(bolt11: bolt11)
+                        SendReviewView(
+                            recipient: bolt11.payeeLabel,
+                            amount: bolt11.amountSats ?? 0,
+                            invoicePR: bolt11.toStr(),
+                            btcPrice: state.btcPrice
+                        )
                     case .reviewPayment(let recipient, let amount, let invoicePR):
                         SendReviewView(
                             recipient: recipient,

@@ -23,6 +23,9 @@ public class AppState {
     var route: Route = .setup
     var triggerDataSync = false
     var triggerLogout = false
+
+    /// A `lightning:` or `bitcoin:` URI that arrived before the wallet was ready to pay it.
+    private var pendingPaymentInput: String?
     
     @ObservationIgnored
     lazy var walletState = WalletState(parentState: self)
@@ -30,12 +33,28 @@ public class AppState {
     lazy var setupState = SetupState(parentState: self)
     
     func onOpenURL(_ url: URL) async {
-        guard url.scheme == "avocadough" else { return }
-        
-        switch url.host() {
+        guard let scheme = url.scheme?.lowercased() else { return }
+
+        switch scheme {
+        case "lightning", "bitcoin":
+            pay(url.absoluteString)
+        case "avocadough":
+            switch url.host() {
+            default:
+                break
+            }
         default:
             break
         }
+    }
+
+    /// Hands a payment URI to the wallet, or holds on to it until the wallet is showing.
+    private func pay(_ input: String) {
+        guard route == .wallet else {
+            pendingPaymentInput = input
+            return
+        }
+        walletState.send(input)
     }
     
     func determineRoute() {
@@ -53,6 +72,10 @@ public class AppState {
     
     func configSuccessful() {
         route = .wallet
+
+        guard let pendingPaymentInput else { return }
+        self.pendingPaymentInput = nil
+        walletState.send(pendingPaymentInput)
     }
     
     func saveInfo(_ info: WalletConnectManager.WalletInfo) {
@@ -65,6 +88,7 @@ public class AppState {
     
     func logout(error: LocalizedStringKey? = nil) {
         triggerLogout.toggle()
+        pendingPaymentInput = nil
         setupState.errorMessage = error
         try? Vault.deletePrivateKey(keychainConfiguration: .nwcSecret)
         route = .setup

@@ -58,18 +58,61 @@ class SendState {
         parentState.paymentSent()
         clearPathAndCloseSheet()
     }
+
+    /// Starts a fresh send flow at the destination for `input`. Used when another app or
+    /// an NFC tag hands us a `lightning:` / `bitcoin:` URI.
+    func start(with input: String) {
+        path = []
+        continueWithInput(input)
+    }
     
+    /// Pushes the destination for `lightningInput`, or surfaces an error and leaves the
+    /// path alone when the input isn't payable.
+    ///
+    /// With `replaceCurrentPath` the destination swaps in for the screen on top of the
+    /// stack (the QR scanner). On an error that screen is popped instead so the alert on
+    /// the root view is visible.
     func continueWithInput(_ lightningInput: String, replaceCurrentPath: Bool = false) {
-        let navigationPath: NavigationLink = if let bolt11 = Bolt11Invoice.fromStr(s: lightningInput).getValue() {
-            .sendInvoice(bolt11)
-        } else {
-            .getLightningAddressDetails(lightningInput)
+        guard let destination = destination(for: lightningInput) else {
+            if replaceCurrentPath {
+                path.removeAll { $0 == .scanQR }
+            }
+            return
         }
-        
-        if replaceCurrentPath {
-            path[path.index(before: path.endIndex)] = navigationPath
+
+        if replaceCurrentPath, !path.isEmpty {
+            path[path.index(before: path.endIndex)] = destination
         } else {
-            path.append(navigationPath)
+            path.append(destination)
+        }
+    }
+
+    private func destination(for lightningInput: String) -> NavigationLink? {
+        guard let input = LightningInput(lightningInput) else {
+            errorMessage = "Enter an invoice, Lightning address, or LNURL."
+            return nil
+        }
+
+        switch input {
+        case .bolt11(let invoice):
+            guard let bolt11 = Bolt11Invoice.fromStr(s: invoice).getValue() else {
+                errorMessage = "That Lightning invoice couldn't be read. Ask for a new one and try again."
+                return nil
+            }
+            guard !bolt11.isExpired() else {
+                errorMessage = "That Lightning invoice has expired. Ask for a new one and try again."
+                return nil
+            }
+            guard let amount = bolt11.amountSats, amount > 0 else {
+                errorMessage = "Invoices without an amount aren't supported yet."
+                return nil
+            }
+            return .sendInvoice(bolt11)
+        case .recipient(let recipient):
+            return .getLightningAddressDetails(recipient)
+        case .onChainOnly:
+            errorMessage = "On-chain bitcoin addresses aren't supported. Ask for a Lightning invoice instead."
+            return nil
         }
     }
     

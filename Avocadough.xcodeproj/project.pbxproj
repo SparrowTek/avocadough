@@ -13,7 +13,18 @@
 		6CECC8AA2C5C03E7000F688B /* LightningDevKit in Frameworks */ = {isa = PBXBuildFile; productRef = 6CECC8A92C5C03E7000F688B /* LightningDevKit */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		6CB0000012010004A1201004 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 6CDD4BE02B25210E00C6C324 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 6CDD4BE72B25210E00C6C324;
+			remoteInfo = Avocadough;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
+		6CB0000012010003A1201003 /* AvocadoughTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AvocadoughTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		6CDD4BE82B25210E00C6C324 /* Avocadough.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Avocadough.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -28,12 +39,20 @@
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		6CB0000012010002A1201002 /* AvocadoughTests */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = AvocadoughTests; sourceTree = "<group>"; };
 		6CD88D932CF191E400E9B653 /* Avocadough */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (6CD88DBE2CF191E400E9B653 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = Avocadough; sourceTree = "<group>"; };
 		6CD88DC02CF191E700E9B653 /* Configurations */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Configurations; sourceTree = "<group>"; };
 		6CD88DC22CF191EA00E9B653 /* ci_scripts */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = ci_scripts; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		6CB0000012010007A1201007 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		6CDD4BE52B25210E00C6C324 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -54,6 +73,7 @@
 				6CD88DC22CF191EA00E9B653 /* ci_scripts */,
 				6CD88DC02CF191E700E9B653 /* Configurations */,
 				6CD88D932CF191E400E9B653 /* Avocadough */,
+				6CB0000012010002A1201002 /* AvocadoughTests */,
 				6CDD4BE92B25210E00C6C324 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -62,6 +82,7 @@
 			isa = PBXGroup;
 			children = (
 				6CDD4BE82B25210E00C6C324 /* Avocadough.app */,
+				6CB0000012010003A1201003 /* AvocadoughTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -69,6 +90,29 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		6CB0000012010001A1201001 /* AvocadoughTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 6CB0000012010009A1201009 /* Build configuration list for PBXNativeTarget "AvocadoughTests" */;
+			buildPhases = (
+				6CB0000012010006A1201006 /* Sources */,
+				6CB0000012010007A1201007 /* Frameworks */,
+				6CB0000012010008A1201008 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				6CB0000012010005A1201005 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				6CB0000012010002A1201002 /* AvocadoughTests */,
+			);
+			name = AvocadoughTests;
+			packageProductDependencies = (
+			);
+			productName = AvocadoughTests;
+			productReference = 6CB0000012010003A1201003 /* AvocadoughTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		6CDD4BE72B25210E00C6C324 /* Avocadough */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 6CDD4BF62B25210F00C6C324 /* Build configuration list for PBXNativeTarget "Avocadough" */;
@@ -105,6 +149,10 @@
 				LastSwiftUpdateCheck = 1500;
 				LastUpgradeCheck = 2640;
 				TargetAttributes = {
+					6CB0000012010001A1201001 = {
+						CreatedOnToolsVersion = 16.0;
+						TestTargetID = 6CDD4BE72B25210E00C6C324;
+					};
 					6CDD4BE72B25210E00C6C324 = {
 						CreatedOnToolsVersion = 15.0.1;
 					};
@@ -129,11 +177,19 @@
 			projectRoot = "";
 			targets = (
 				6CDD4BE72B25210E00C6C324 /* Avocadough */,
+				6CB0000012010001A1201001 /* AvocadoughTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		6CB0000012010008A1201008 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		6CDD4BE62B25210E00C6C324 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -144,6 +200,13 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		6CB0000012010006A1201006 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		6CDD4BE42B25210E00C6C324 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -153,7 +216,77 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		6CB0000012010005A1201005 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 6CDD4BE72B25210E00C6C324 /* Avocadough */;
+			targetProxy = 6CB0000012010004A1201004 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin XCBuildConfiguration section */
+		6CB000001201000AA120100A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = VFXJQ4U7H8;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.sparrowtek.avocadough.tests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_STRICT_CONCURRENCY = complete;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = 1;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Avocadough.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Avocadough";
+			};
+			name = Debug;
+		};
+		6CB000001201000BA120100B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = VFXJQ4U7H8;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.sparrowtek.avocadough.tests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_STRICT_CONCURRENCY = complete;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = 1;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Avocadough.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Avocadough";
+			};
+			name = Release;
+		};
 		6CDD4BF42B25210F00C6C324 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReferenceAnchor = 6CD88DC02CF191E700E9B653 /* Configurations */;
@@ -358,6 +491,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		6CB0000012010009A1201009 /* Build configuration list for PBXNativeTarget "AvocadoughTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6CB000001201000AA120100A /* Debug */,
+				6CB000001201000BA120100B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		6CDD4BE32B25210E00C6C324 /* Build configuration list for PBXProject "Avocadough" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
