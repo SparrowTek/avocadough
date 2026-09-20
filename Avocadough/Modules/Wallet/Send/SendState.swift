@@ -28,8 +28,39 @@ class SendState {
         case bolt11Invoice(String)
         case bolt11LookupRequired(String)
     }
+
+    /// Why an input can't start a payment: what the user is told, and how the
+    /// diagnostics log names it.
+    private enum InputRejection: Error {
+        case nothingPayable
+        case unreadableInvoice
+        case expiredInvoice
+        case amountlessInvoice
+        case onChainOnly
+
+        var message: LocalizedStringKey {
+            switch self {
+            case .nothingPayable: "Enter an invoice, Lightning address, or LNURL."
+            case .unreadableInvoice: "That Lightning invoice couldn't be read. Ask for a new one and try again."
+            case .expiredInvoice: "That Lightning invoice has expired. Ask for a new one and try again."
+            case .amountlessInvoice: "Invoices without an amount aren't supported yet."
+            case .onChainOnly: "On-chain bitcoin addresses aren't supported. Ask for a Lightning invoice instead."
+            }
+        }
+
+        var diagnosticName: String {
+            switch self {
+            case .nothingPayable: "nothing payable"
+            case .unreadableInvoice: "unreadable invoice"
+            case .expiredInvoice: "expired invoice"
+            case .amountlessInvoice: "invoice without an amount"
+            case .onChainOnly: "on-chain only"
+            }
+        }
+    }
     
     private unowned let parentState: WalletState
+    let diagnostics: DiagnosticsLog
     var path: [SendState.NavigationLink] = []
     var errorMessage: LocalizedStringKey?
     var btcPrice: Double? {
@@ -39,8 +70,9 @@ class SendState {
     @ObservationIgnored
     lazy var scanQRCodeState = ScanQRCodeState(parentState: self)
     
-    init(parentState: WalletState) {
+    init(parentState: WalletState, diagnostics: DiagnosticsLog = .shared) {
         self.parentState = parentState
+        self.diagnostics = diagnostics
     }
 
     func navigateToReview(recipient: String, amount: UInt64, invoicePR: String) {
@@ -70,48 +102,55 @@ class SendState {
     ///
     /// With `replaceCurrentPath` the destination swaps in for the screen on top of the
     /// stack (the QR scanner). On an error that screen is popped instead so the alert on
-    /// the root view is visible.
+    /// the root view is visible. Every decision along the way is recorded in the
+    /// diagnostics log.
     func continueWithInput(_ lightningInput: String, replaceCurrentPath: Bool = false) {
-        guard let destination = destination(for: lightningInput) else {
+        diagnostics.record(.send, replaceCurrentPath ? "Received a scanned code" : "Received input", detail: lightningInput)
+
+        switch destination(for: lightningInput) {
+        case .success(let destination):
+            if replaceCurrentPath, !path.isEmpty {
+                path[path.index(before: path.endIndex)] = destination
+                diagnostics.record(.send, "Replaced the top screen with \(destination.diagnosticName)")
+            } else {
+                path.append(destination)
+                diagnostics.record(.send, "Pushed \(destination.diagnosticName)")
+            }
+        case .failure(let rejection):
+            errorMessage = rejection.message
+            diagnostics.record(.send, "Rejected input: \(rejection.diagnosticName)")
             if replaceCurrentPath {
                 path.removeAll { $0 == .scanQR }
+                diagnostics.record(.send, "Popped the scanner so the error alert can show")
             }
-            return
-        }
-
-        if replaceCurrentPath, !path.isEmpty {
-            path[path.index(before: path.endIndex)] = destination
-        } else {
-            path.append(destination)
         }
     }
 
-    private func destination(for lightningInput: String) -> NavigationLink? {
+    private func destination(for lightningInput: String) -> Result<NavigationLink, InputRejection> {
         guard let input = LightningInput(lightningInput) else {
-            errorMessage = "Enter an invoice, Lightning address, or LNURL."
-            return nil
+            return .failure(.nothingPayable)
         }
 
         switch input {
         case .bolt11(let invoice):
             guard let decoded = DecodedInvoice(invoice) else {
-                errorMessage = "That Lightning invoice couldn't be read. Ask for a new one and try again."
-                return nil
+                diagnostics.record(.send, "Looks like a BOLT11 invoice, but LDK couldn't parse it", detail: invoice)
+                return .failure(.unreadableInvoice)
             }
+            diagnostics.record(.send, "Decoded a BOLT11 invoice", detail: decoded.diagnosticDescription)
             guard !decoded.isExpired else {
-                errorMessage = "That Lightning invoice has expired. Ask for a new one and try again."
-                return nil
+                return .failure(.expiredInvoice)
             }
             guard let amount = decoded.amountSats, amount > 0 else {
-                errorMessage = "Invoices without an amount aren't supported yet."
-                return nil
+                return .failure(.amountlessInvoice)
             }
-            return .sendInvoice(decoded)
+            return .success(.sendInvoice(decoded))
         case .recipient(let recipient):
-            return .getLightningAddressDetails(recipient)
-        case .onChainOnly:
-            errorMessage = "On-chain bitcoin addresses aren't supported. Ask for a Lightning invoice instead."
-            return nil
+            diagnostics.record(.send, "Treating the input as a recipient to look up over LNURL-pay", detail: recipient)
+            return .success(.getLightningAddressDetails(recipient))
+        case .onChainOnly(let address):
+            diagnostics.record(.send, "The input only carries an on-chain address", detail: address)
+            return .failure(.onChainOnly)
         }
     }
     
@@ -136,5 +175,27 @@ extension SendState: ScanQRCodeStateParent {
     
     func foundQRCode(_ code: String) {
         continueWithInput(code, replaceCurrentPath: true)
+    }
+}
+
+// MARK: - Diagnostics descriptions
+
+private extension SendState.NavigationLink {
+    var diagnosticName: String {
+        switch self {
+        case .sendInvoice: "the invoice review screen"
+        case .getLightningAddressDetails: "the lightning address screen"
+        case .reviewPayment: "the payment review screen"
+        case .paymentSuccess: "the payment success screen"
+        case .scanQR: "the QR scanner"
+        }
+    }
+}
+
+private extension DecodedInvoice {
+    var diagnosticDescription: String {
+        let amount = amountSats.map { "\($0) sats" } ?? "no amount"
+        let expiry = isExpired ? "expired" : "not expired"
+        return "\(amount) · \(expiry) · payee \(payeeLabel) · payment hash \(paymentHash)"
     }
 }

@@ -15,6 +15,7 @@ class SettingsState {
         case privacy
         case theme
         case support
+        case diagnostics
     }
     
     private unowned let parentState: WalletState

@@ -10,7 +10,8 @@ import SwiftUI
 struct AppPresenter: View {
     @Environment(AppState.self) private var state
     @Environment(\.nwc) private var nwc
-    
+    @Environment(\.diagnostics) private var diagnostics
+
     var body: some View {
         @Bindable var state = state
         
@@ -27,12 +28,15 @@ struct AppPresenter: View {
             }
         }
         .onOpenURL()
-        .task { await determineRoute() }
+        .task { await launch() }
         .logoutTracker()
     }
     
-    private func determineRoute() async {
+    /// Notes the launch in the diagnostics trail, then lets AppState pick the route.
+    private func launch() async {
+        diagnostics.record(.app, "Launched Avocadough \(Build.shared.version) (\(Build.shared.build)) · \(Build.shared.environment.rawValue)")
         await state.determineRoute()
+        diagnostics.record(.app, "Initial route: \(state.route)")
     }
 }
 

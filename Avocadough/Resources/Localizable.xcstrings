@@ -71,6 +71,9 @@
     "Avocadough" : {
 
     },
+    "Avocadough diagnostics" : {
+
+    },
     "Avocadough displays links and content from third-party sites. These have their own independent privacy policies, and we have no responsibility or liability for their content or activities." : {
 
     },
@@ -107,6 +110,15 @@
     "Children’s Online Privacy Protection Act Compliance" : {
 
     },
+    "Clear" : {
+
+    },
+    "Clear log" : {
+
+    },
+    "Clear the diagnostics log?" : {
+
+    },
     "color scheme" : {
 
     },
@@ -137,6 +149,9 @@
     "Copy Invoice" : {
 
     },
+    "Copy last scan" : {
+
+    },
     "Create Invoice" : {
 
     },
@@ -147,6 +162,9 @@
 
     },
     "dark mode tint" : {
+
+    },
+    "Diagnostics" : {
 
     },
     "Disconnect" : {
@@ -245,7 +263,16 @@
     "Max" : {
 
     },
+    "More" : {
+
+    },
     "Need a wallet?" : {
+
+    },
+    "Newest first. The shared report includes scanned payloads and invoice text." : {
+
+    },
+    "No diagnostics yet" : {
 
     },
     "No Results" : {
@@ -333,6 +360,9 @@
 
     },
     "Scan" : {
+
+    },
+    "Scan a QR code or open a lightning: link and every step shows up here." : {
 
     },
     "scan QR" : {

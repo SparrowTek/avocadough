@@ -4,6 +4,7 @@
 //
 
 import Testing
+import Foundation
 @testable import Avocadough
 
 @MainActor
@@ -12,7 +13,10 @@ struct SendStateInputTests {
     private let expiredInvoice = "lnbc20u1pn2hnhmpp5hf964hhc77lf4vjpltdnuma0fdl2pp2afagzueg8h2gv8x2ju5tqdpzw3jhxarfdenjqnzyfvsxjm3qgfhk7um50gcqzzsxqyz5vqsp5a8ayrhgzyhgce6y49m9z5ypvngslkkajjfz8dx3qeg94gtl6dg9q9qxpqysgq53s3ddmvy0x2lq3jm06lh9eul0w8mtmgpct09g68uuketgw2xvsyfwmm6qjj9t7hrtu8ul859c93ggaz69quj9ltpszt4022cca6znsq9v2lmp"
 
     private func makeState() -> SendState {
-        SendState(parentState: WalletState(parentState: AppState()))
+        let directory = FileManager.default.temporaryDirectory
+            .appending(path: "SendStateInputTests-\(UUID().uuidString)")
+        let diagnostics = DiagnosticsLog(store: DiagnosticsStore(directory: directory))
+        return SendState(parentState: WalletState(parentState: AppState()), diagnostics: diagnostics)
     }
 
     @Test("A wrapped invoice reaches LDK instead of the address flow")
@@ -88,5 +92,27 @@ struct SendStateInputTests {
         state.start(with: "lightning:alice@getalby.com")
 
         #expect(state.path == [.getLightningAddressDetails("alice@getalby.com")])
+    }
+
+    @Test("A rejected scan leaves a diagnostics trail that starts with the raw payload")
+    func rejectedScanIsLogged() {
+        let state = makeState()
+        state.path = [.scanQR]
+        state.foundQRCode("bitcoin:bc1qar0srrr7xfkvy5l643lydnw9re59gtzzwf5mdq")
+
+        let events = state.diagnostics.events
+        #expect(events.first?.summary == "Received a scanned code")
+        #expect(events.first?.detail == "bitcoin:bc1qar0srrr7xfkvy5l643lydnw9re59gtzzwf5mdq")
+        #expect(events.map(\.summary).contains("Rejected input: on-chain only"))
+        #expect(events.map(\.summary).contains("Popped the scanner so the error alert can show"))
+    }
+
+    @Test("An accepted scan records what replaced the scanner")
+    func acceptedScanIsLogged() {
+        let state = makeState()
+        state.path = [.scanQR]
+        state.foundQRCode("alice@getalby.com")
+
+        #expect(state.diagnostics.events.last?.summary == "Replaced the top screen with the lightning address screen")
     }
 }

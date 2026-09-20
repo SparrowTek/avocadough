@@ -11,6 +11,7 @@ import LightningDevKit
 
 struct SendDetailsView: View {
     @Environment(SendState.self) private var state
+    @Environment(\.diagnostics) private var diagnostics
     var lightningAddress: String
     @State private var amount: UInt64 = 0
     @State private var isLoading = false
@@ -94,21 +95,25 @@ struct SendDetailsView: View {
         defer { isLoading = false }
 
         guard amount >= 1 else {
+            diagnostics.record(.send, "Rejected the amount: none entered")
             errorMessage = "Please enter an amount"
             return
         }
 
         guard amount <= 5_000_000 else {
+            diagnostics.record(.send, "Rejected the amount: \(amount) sats is over the 5,000,000 sat cap")
             errorMessage = "Amount must be 5,000,000 sats or less"
             return
         }
 
         guard amount <= maxAmount else {
+            diagnostics.record(.send, "Rejected the amount: \(amount) sats exceeds the \(maxAmount) sat balance")
             errorMessage = "Amount exceeds available balance"
             return
         }
 
         let millisats = "\(amount * 1000)"
+        diagnostics.record(.send, "Requesting an invoice for \(amount) sats over LNURL-pay", detail: lightningAddress)
 
         do {
             let invoice = try await GenerateInvoiceService().generateInvoice(
@@ -118,19 +123,24 @@ struct SendDetailsView: View {
             )
 
             guard let invoicePR = invoice.pr, !invoicePR.isEmpty else {
+                diagnostics.record(.send, "LNURL-pay answered without an invoice")
                 errorMessage = "Failed to create invoice. Please try again."
                 return
             }
 
             // Validate the invoice using LightningDevKit
             guard Bolt11Invoice.fromStr(s: invoicePR).getValue() != nil else {
+                diagnostics.record(.send, "LNURL-pay returned an invoice LDK couldn't parse", detail: invoicePR)
                 errorMessage = "Failed to create invoice. Please try again."
                 return
             }
 
+            diagnostics.record(.send, "Received an invoice over LNURL-pay; moving to review", detail: invoicePR)
+
             // Navigate to review screen
             state.navigateToReview(recipient: lightningAddress, amount: amount, invoicePR: invoicePR)
         } catch {
+            diagnostics.record(.send, "The LNURL-pay request failed", detail: String(describing: error))
             errorMessage = "Failed to create invoice. Please try again."
         }
     }

@@ -26,25 +26,36 @@ public class AppState {
 
     /// A `lightning:` or `bitcoin:` URI that arrived before the wallet was ready to pay it.
     private var pendingPaymentInput: String?
+
+    let diagnostics: DiagnosticsLog
     
     @ObservationIgnored
     lazy var walletState = WalletState(parentState: self)
     @ObservationIgnored
     lazy var setupState = SetupState(parentState: self)
+
+    init(diagnostics: DiagnosticsLog = .shared) {
+        self.diagnostics = diagnostics
+    }
     
     func onOpenURL(_ url: URL) async {
-        guard let scheme = url.scheme?.lowercased() else { return }
+        guard let scheme = url.scheme?.lowercased() else {
+            diagnostics.record(.url, "Ignored a URL without a scheme", detail: url.absoluteString)
+            return
+        }
 
         switch scheme {
         case "lightning", "bitcoin":
+            diagnostics.record(.url, "Received a \(scheme): URL", detail: url.absoluteString)
             pay(url.absoluteString)
         case "avocadough":
+            diagnostics.record(.url, "Received an avocadough: URL; nothing handles its host yet", detail: url.absoluteString)
             switch url.host() {
             default:
                 break
             }
         default:
-            break
+            diagnostics.record(.url, "Ignored a URL with an unsupported scheme", detail: url.absoluteString)
         }
     }
 
@@ -52,8 +63,10 @@ public class AppState {
     private func pay(_ input: String) {
         guard route == .wallet else {
             pendingPaymentInput = input
+            diagnostics.record(.url, "The wallet isn't showing yet (route: \(route)); holding the payment URI")
             return
         }
+        diagnostics.record(.url, "Handing the payment URI to the send flow")
         walletState.send(input)
     }
     
@@ -74,6 +87,7 @@ public class AppState {
 
         guard let pendingPaymentInput else { return }
         self.pendingPaymentInput = nil
+        diagnostics.record(.url, "The wallet is ready; handing over the held payment URI")
         walletState.send(pendingPaymentInput)
     }
     

@@ -30,9 +30,14 @@ struct MakeInvoiceResponse: Sendable, Hashable {
 @MainActor
 class NWC {
     private let walletManager = WalletConnectManager()
+    private let diagnostics: DiagnosticsLog
     private var storedUri: String?
     var hasConnected = false
-    
+
+    init(diagnostics: DiagnosticsLog = .shared) {
+        self.diagnostics = diagnostics
+    }
+
     /// Tears down the wallet connection and forgets its credentials everywhere they
     /// live: the connections NostrKit persists in its own keychain service (each one
     /// carries the client secret) and the app's copy of the secret.
@@ -96,7 +101,9 @@ class NWC {
         do {
             try await walletManager.connect(uri: uri)
             hasConnected = true
+            diagnostics.record(.wallet, "Connected to the NWC wallet", detail: "relay \(relay) · wallet \(pubKey.prefix(8))…")
         } catch {
+            diagnostics.record(.wallet, "The NWC connection failed", detail: String(describing: error))
             throw .nostrKit(error)
         }
     }
@@ -128,8 +135,11 @@ class NWC {
     @discardableResult
     func payInvoice(_ invoice: String) async throws(NWCError) -> WalletConnectManager.PaymentResult {
         do {
-            return try await walletManager.payInvoice(invoice)
+            let result = try await walletManager.payInvoice(invoice)
+            diagnostics.record(.wallet, "pay_invoice succeeded", detail: "fees \(result.feesPaid ?? 0) msat")
+            return result
         } catch {
+            diagnostics.record(.wallet, "pay_invoice failed", detail: String(describing: error))
             throw .nostrKit(error)
         }
     }
@@ -139,8 +149,12 @@ class NWC {
     ///   the wallet issued and a payment it made.
     func lookupInvoice(paymentHash: String) async throws(NWCError) -> WalletConnectManager.InvoiceLookupResult {
         do {
-            return try await walletManager.lookupInvoice(paymentHash: paymentHash)
+            let result = try await walletManager.lookupInvoice(paymentHash: paymentHash)
+            let state = result.state.map { "\($0)" } ?? "unknown"
+            diagnostics.record(.wallet, "lookup_invoice found the payment in state \(state)", detail: "payment hash \(paymentHash)")
+            return result
         } catch {
+            diagnostics.record(.wallet, "lookup_invoice failed", detail: String(describing: error))
             throw .nostrKit(error)
         }
     }
