@@ -28,7 +28,7 @@ fileprivate struct LogoutTracker: ViewModifier {
     }
     
     private func logout() async {
-        nwc.logout()
+        await nwc.logout()
         nwcConnections.forEach { context.delete($0) }
         transactions.forEach { context.delete($0) }
         wallets.forEach { context.delete($0) }

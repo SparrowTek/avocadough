@@ -22,8 +22,13 @@ struct SendPresenter: View {
                         SendDetailsView(lightningAddress: address)
                     case .resolveIdentity(let identifier):
                         ResolveIdentityView(identifier: identifier)
-                    case .sendInvoice(let bolt11):
-                        SendConfirmationView(bolt11: bolt11)
+                    case .sendInvoice(let invoice):
+                        SendReviewView(
+                            recipient: invoice.payeeLabel,
+                            amount: invoice.amountSats ?? 0,
+                            invoicePR: invoice.bolt11,
+                            btcPrice: state.btcPrice
+                        )
                     case .reviewPayment(let recipient, let amount, let invoicePR):
                         SendReviewView(
                             recipient: recipient,

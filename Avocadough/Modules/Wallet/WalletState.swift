@@ -86,6 +86,13 @@ class WalletState {
         sheet = .send
         sendState.routeToSupport()
     }
+
+    /// Opens the send flow straight onto the destination for `input`, such as a
+    /// `lightning:` URI handed over by another app or an NFC tag.
+    func send(_ input: String) {
+        sendState.start(with: input)
+        sheet = .send
+    }
 }
 
 extension WalletState: ReachabilityDelegate {

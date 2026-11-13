@@ -17,9 +17,6 @@
         }
       }
     },
-    "%llu sats" : {
-
-    },
     "••••••" : {
 
     },
@@ -68,6 +65,9 @@
     "Avocadough" : {
 
     },
+    "Avocadough diagnostics" : {
+
+    },
     "Avocadough displays links and content from third-party sites. These have their own independent privacy policies, and we have no responsibility or liability for their content or activities." : {
 
     },
@@ -101,6 +101,15 @@
     "Children’s Online Privacy Protection Act Compliance" : {
 
     },
+    "Clear" : {
+
+    },
+    "Clear log" : {
+
+    },
+    "Clear the diagnostics log?" : {
+
+    },
     "color scheme" : {
 
     },
@@ -108,12 +117,6 @@
 
     },
     "Completed" : {
-
-    },
-    "confirm" : {
-
-    },
-    "Confirm invoice:" : {
 
     },
     "Connect Your Wallet" : {
@@ -134,6 +137,9 @@
     "Copy Invoice" : {
 
     },
+    "Copy last scan" : {
+
+    },
     "Create Invoice" : {
 
     },
@@ -144,6 +150,9 @@
 
     },
     "dark mode tint" : {
+
+    },
+    "Diagnostics" : {
 
     },
     "Disconnect" : {
@@ -162,6 +171,9 @@
 
     },
     "Enter amount to request" : {
+
+    },
+    "Enter an invoice, Lightning address, LNURL, or @handle." : {
 
     },
     "Error" : {
@@ -218,6 +230,9 @@
     "invoice, lightning address, or LNURL" : {
 
     },
+    "Invoices without an amount aren't supported yet." : {
+
+    },
     "light" : {
 
     },
@@ -233,7 +248,16 @@
     "Max" : {
 
     },
+    "More" : {
+
+    },
     "Need a wallet?" : {
+
+    },
+    "Newest first. The shared report includes scanned payloads and invoice text." : {
+
+    },
+    "No diagnostics yet" : {
 
     },
     "No Results" : {
@@ -249,6 +273,9 @@
 
     },
     "OK" : {
+
+    },
+    "On-chain bitcoin addresses aren't supported. Ask for a Lightning invoice instead." : {
 
     },
     "or paste connection string" : {
@@ -320,6 +347,9 @@
     "Scan" : {
 
     },
+    "Scan a QR code or open a lightning: link and every step shows up here." : {
+
+    },
     "scan QR" : {
 
     },
@@ -386,6 +416,12 @@
     "Technical basics" : {
 
     },
+    "That Lightning invoice couldn't be read. Ask for a new one and try again." : {
+
+    },
+    "That Lightning invoice has expired. Ask for a new one and try again." : {
+
+    },
     "The current NWC wallet connection does not have permission to make an invoice" : {
 
     },
@@ -393,9 +429,6 @@
 
     },
     "The current NWC wallet connection does not have permission to send sats" : {
-
-    },
-    "There was a problem confirming your payment. Please try again later" : {
 
     },
     "Third-party links and content" : {

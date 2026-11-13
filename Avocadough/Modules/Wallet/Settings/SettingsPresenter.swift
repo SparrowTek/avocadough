@@ -25,6 +25,8 @@ struct SettingsPresenter: View {
                         SupportView()
                     case .theme:
                         ThemeSettingsView()
+                    case .diagnostics:
+                        DiagnosticsView()
                     }
                 }
         }
@@ -77,6 +79,10 @@ private struct SettingsView: View {
 
                 NavigationLink(value: SettingsState.NavigationLink.support) {
                     SettingsRow(icon: "bitcoinsign.circle.fill", title: "Support Avocadough", color: .orange)
+                }
+
+                NavigationLink(value: SettingsState.NavigationLink.diagnostics) {
+                    SettingsRow(icon: "waveform.path.ecg", title: "Diagnostics", color: DesignTokens.Colors.Accent.info)
                 }
             } header: {
                 Text("General")

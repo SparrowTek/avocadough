@@ -21,6 +21,7 @@ struct AvocadoughApp: App {
                 .setupModel()
                 .environment(\.nwc, nwc)
                 .environment(\.reachability, reachability)
+                .environment(\.diagnostics, DiagnosticsLog.shared)
         }
     }
 }

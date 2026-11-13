@@ -9,6 +9,7 @@ import NostrKit
 struct SendReviewView: View {
     @Environment(SendState.self) private var state
     @Environment(\.nwc) private var nwc
+    @Environment(\.diagnostics) private var diagnostics
 
     let recipient: String
     let amount: UInt64
@@ -112,20 +113,40 @@ struct SendReviewView: View {
         isLoading = true
         defer { isLoading = false }
 
+        diagnostics.record(.send, "Paying \(amount) sats", detail: "to \(recipient)\n\(invoicePR)")
+
         do {
             let _ = try await nwc.payInvoice(invoicePR)
+            diagnostics.record(.send, "Payment succeeded; showing the success screen")
             state.showPaymentSuccess(amount: amount, recipient: recipient)
         } catch {
             if case .nostrKit(let inner) = error,
                let relayError = inner as? RelayError,
                case .timeout = relayError {
-                // Request was published but no response received in time.
-                // Payment may have succeeded, so show success and let transaction sync resolve.
-                state.showPaymentSuccess(amount: amount, recipient: recipient)
+                diagnostics.record(.send, "The relay didn't answer in time; asking the wallet what happened")
+                await resolveTimedOutPayment()
             } else {
+                diagnostics.record(.send, "Payment failed; showing the error alert", detail: String(describing: error))
                 errorMessage = "Payment failed. Please check your wallet and try again."
             }
         }
+    }
+
+    /// The request went out but no response arrived in time, so the outcome is unknown.
+    /// Ask the wallet before deciding: only a payment it reports as failed is shown as
+    /// one. Anything else (settled, still pending, or a wallet that can't look payments
+    /// up) keeps the optimistic path, and transaction sync shows the final state.
+    private func resolveTimedOutPayment() async {
+        guard let paymentHash = DecodedInvoice(invoicePR)?.paymentHash,
+              let payment = try? await nwc.lookupInvoice(paymentHash: paymentHash),
+              payment.state == .failed else {
+            diagnostics.record(.send, "The wallet didn't report a failure; showing the success screen")
+            state.showPaymentSuccess(amount: amount, recipient: recipient)
+            return
+        }
+
+        diagnostics.record(.send, "The wallet reports the payment failed; showing the error alert")
+        errorMessage = "Payment failed. Please check your wallet and try again."
     }
 }
 

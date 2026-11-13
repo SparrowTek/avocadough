@@ -245,7 +245,7 @@ struct DisplayInvoiceView: View {
         guard !isSettled else { return }
         for await event in nwc.events {
             guard !Task.isCancelled else { return }
-            if event == .paymentReceived {
+            if case .paymentReceived = event {
                 state.refreshTransactions()
             }
         }
