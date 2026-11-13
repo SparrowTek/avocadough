@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SwiftData
 import CoreNostr
 
 fileprivate struct SyncTransactionData: ViewModifier {

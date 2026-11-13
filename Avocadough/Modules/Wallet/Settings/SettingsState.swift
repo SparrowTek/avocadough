@@ -16,6 +16,8 @@ class SettingsState {
         case theme
         case support
         case diagnostics
+        /// AT Protocol identity: sign in and publish the payment address.
+        case identity
     }
     
     private unowned let parentState: WalletState

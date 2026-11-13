@@ -27,6 +27,8 @@ struct SettingsPresenter: View {
                         ThemeSettingsView()
                     case .diagnostics:
                         DiagnosticsView()
+                    case .identity:
+                        ATProtoIdentityView()
                     }
                 }
         }
@@ -37,6 +39,7 @@ struct SettingsPresenter: View {
 
 private struct SettingsView: View {
     @Environment(SettingsState.self) private var state
+    @Environment(\.nwc) private var nwc
 
     // MARK: color scheme properties
     @State private var selectedColorScheme = 0
@@ -51,7 +54,7 @@ private struct SettingsView: View {
                 InfoCard(
                     icon: "bolt.fill",
                     title: "NWC Wallet",
-                    subtitle: "Connected",
+                    subtitle: nwc.hasConnected ? "Connected" : "Not connected",
                     iconColor: .yellow,
                     style: .transparent
                 )
@@ -59,6 +62,15 @@ private struct SettingsView: View {
                 .listRowBackground(Color.clear)
             } header: {
                 Text("Wallet")
+            }
+
+            // MARK: - Identity Section
+            Section {
+                NavigationLink(value: SettingsState.NavigationLink.identity) {
+                    IdentityRow()
+                }
+            } header: {
+                Text("Identity")
             }
 
             // MARK: - General Section
@@ -108,12 +120,7 @@ private struct SettingsView: View {
                         Text("Disconnect and Clear Data")
                     }
                 }
-                .confirmationDialog("Are you sure you want to disconnect?", isPresented: $state.presentNWCDisconnectDialog, titleVisibility: .visible) {
-                    Button("Disconnect", role: .destructive, action: disconnectNWC)
-                    Button("Cancel", role: .cancel) {}
-                } message: {
-                    Text("This will remove your wallet connection and all local data.")
-                }
+                .disconnectConfirmation(isPresented: $state.presentNWCDisconnectDialog, disconnect: disconnect)
             }
         }
         .fullScreenColorView()
@@ -122,7 +129,7 @@ private struct SettingsView: View {
         .onChange(of: selectedColorScheme, updateColorScheme)
     }
 
-    private func disconnectNWC() {
+    private func disconnect() {
         state.disconnectNWC()
     }
 
@@ -144,6 +151,38 @@ private struct SettingsView: View {
         case 1: colorSchemeString = Build.Constants.Theme.light
         case 2: colorSchemeString = Build.Constants.Theme.dark
         default: colorSchemeString = nil
+        }
+    }
+}
+
+// MARK: - Identity Row
+
+private struct IdentityRow: View {
+    @Environment(AuthManager.self) private var authManager
+
+    var body: some View {
+        HStack(spacing: DesignTokens.Spacing.md) {
+            Image(systemName: "at")
+                .font(.system(size: 16, weight: .semibold))
+                .foregroundStyle(DesignTokens.Colors.Accent.primary)
+                .frame(width: 28, height: 28)
+                .background(DesignTokens.Colors.Accent.primary.opacity(0.15))
+                .clipShape(RoundedRectangle(cornerRadius: DesignTokens.Radius.sm))
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text("AT Protocol identity")
+                    .foregroundStyle(Color.ds.textPrimary)
+
+                Group {
+                    if let handle = authManager.currentHandle {
+                        Text(verbatim: "@\(handle)")
+                    } else {
+                        Text("Get paid at your handle")
+                    }
+                }
+                .font(DesignTokens.Typography.caption)
+                .foregroundStyle(Color.ds.textTertiary)
+            }
         }
     }
 }
@@ -177,6 +216,7 @@ private struct SettingsRow: View {
     
     SettingsPresenter()
         .environment(state.walletState.settingsState)
+        .environment(AuthManager())
 }
 
 
@@ -361,6 +401,20 @@ struct PrivacyPolicyView: View {
                 WebSectionView(title: "Information we collect", content: """
                 Avocadough does not create any accounts.
                 """)
+
+                WebSectionView(title: "AT Protocol identity", content: """
+                Signing in with an AT Protocol identity, such as a Bluesky account, is optional. You sign in on your account host’s own page, so Avocadough never sees your password. Signing in gives the app access tokens, which it keeps in the device Keychain, and the only permission it asks for is to manage its own payment address record in your account.
+
+                If you publish a payment address, Avocadough writes a public record to your AT Protocol account that links your handle to your wallet’s Lightning address. Anyone can read that record. It stays in place until you unpublish it in the app, including after you sign out or delete the app.
+                """)
+
+                WebSectionView(title: "Sign-in service", content: """
+                A sign-in service we operate (auth.sparrowtek.com, hosted on Railway) takes part in signing you in and refreshing your session, so that it can sign Avocadough’s requests with Avocadough’s client key. Your tokens pass through it. It has no database and never logs them. The one thing it keeps is the answer to a successful token refresh, in memory for up to ten minutes, so that the app can retry if the answer was lost on the way.
+                """)
+
+                WebSectionView(title: "Looking up a handle", content: """
+                When you pay someone at their handle, or sign in with yours, Avocadough looks the handle up. That contacts the handle’s own domain, a public DNS resolver (Cloudflare), the PLC directory (plc.directory) and the account’s host. Each of them sees your IP address and the handle or account being looked up, as any server you connect to does.
+                """)
                 
                 WebSectionView(title: "Technical basics", content: """
                 Our server software may store basic technical information, such as your IP address, in temporary memory or logs.
@@ -408,7 +462,7 @@ If you have questions regarding this privacy policy, you may email contact@sparr
 """)
                 
                 WebSectionView(title: "Changes to this policy", content: """
-If we decide to change our privacy policy, we will post those changes on this page. Summary of changes so far: June 3, 2025: First published.
+If we decide to change our privacy policy, we will post those changes on this page. Summary of changes so far: June 3, 2025: First published. November 2026: Added AT Protocol identity, the sign-in service and handle lookups.
 """)
             }
         }

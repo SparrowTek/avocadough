@@ -11,6 +11,7 @@
 		6C66BE3E2FA2931D00F0756B /* NostrKit in Frameworks */ = {isa = PBXBuildFile; productRef = 6C66BE3D2FA2931D00F0756B /* NostrKit */; };
 		6C73E5F82B3F0F3B0073C816 /* Vault in Frameworks */ = {isa = PBXBuildFile; productRef = 6C73E5F72B3F0F3B0073C816 /* Vault */; };
 		6CAB10042E1A000100000004 /* AvocadoughKit in Frameworks */ = {isa = PBXBuildFile; productRef = 6CAB10032E1A000100000003 /* AvocadoughKit */; };
+		6CAB10062E1A000100000006 /* CoreATProtocol in Frameworks */ = {isa = PBXBuildFile; productRef = 6CAB10052E1A000100000005 /* CoreATProtocol */; };
 		6CECC8AA2C5C03E7000F688B /* LightningDevKit in Frameworks */ = {isa = PBXBuildFile; productRef = 6CECC8A92C5C03E7000F688B /* LightningDevKit */; };
 /* End PBXBuildFile section */
 
@@ -33,6 +34,7 @@
 		6CD88DBE2CF191E400E9B653 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				System/Avocadough.entitlements,
 				System/Info.plist,
 			);
 			target = 6CDD4BE72B25210E00C6C324 /* Avocadough */;
@@ -63,6 +65,7 @@
 				6C66BE3E2FA2931D00F0756B /* NostrKit in Frameworks */,
 				6CECC8AA2C5C03E7000F688B /* LightningDevKit in Frameworks */,
 				6CAB10042E1A000100000004 /* AvocadoughKit in Frameworks */,
+				6CAB10062E1A000100000006 /* CoreATProtocol in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -137,6 +140,7 @@
 				6C66BB6A2FA243BC00F0756B /* NostrKit */,
 				6C66BE3D2FA2931D00F0756B /* NostrKit */,
 				6CAB10032E1A000100000003 /* AvocadoughKit */,
+				6CAB10052E1A000100000005 /* CoreATProtocol */,
 			);
 			productName = Boostz;
 			productReference = 6CDD4BE82B25210E00C6C324 /* Avocadough.app */;
@@ -425,6 +429,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				AVOCADOUGH_ENV = DEVELOPMENT;
+				CODE_SIGN_ENTITLEMENTS = Avocadough/System/Avocadough.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"Avocadough/Preview Content\"";
@@ -462,6 +467,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				AVOCADOUGH_ENV = PRODUCTION;
+				CODE_SIGN_ENTITLEMENTS = Avocadough/System/Avocadough.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"Avocadough/Preview Content\"";
@@ -575,6 +581,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 6CAB10022E1A000100000002 /* XCLocalSwiftPackageReference "../AvocadoughKit" */;
 			productName = AvocadoughKit;
+		};
+		6CAB10052E1A000100000005 /* CoreATProtocol */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6CAB10012E1A000100000001 /* XCLocalSwiftPackageReference "../../../AtProto/CoreATProtocol" */;
+			productName = CoreATProtocol;
 		};
 		6C73E5F72B3F0F3B0073C816 /* Vault */ = {
 			isa = XCSwiftPackageProductDependency;

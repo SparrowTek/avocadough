@@ -49,6 +49,7 @@ struct WalletPresenter: View {
 
 private struct WalletView: View {
     @Environment(\.reachability) private var reachability
+    @Environment(\.nwc) private var nwc
     @Environment(WalletState.self) private var state
     @State private var requestInProgress = false
     @Query private var wallets: [Wallet]
@@ -65,12 +66,21 @@ private struct WalletView: View {
     private var redactDollarText: Bool {
         wallet == nil && state.btcPrice == nil
     }
+
+    /// The wallet opened on cached data because launch couldn't connect. While the
+    /// network itself is down, its banner already says why.
+    private var showsWalletUnreachable: Bool {
+        !nwc.hasConnected && !isCanvas
+    }
     
     var body: some View {
         VStack(spacing: DesignTokens.Spacing.lg) {
             // Network status banner
             if reachability.connectionState != .good {
                 NetworkStatusBanner()
+                    .transition(.move(edge: .top).combined(with: .opacity))
+            } else if showsWalletUnreachable {
+                WalletUnreachableBanner(isConnecting: nwc.isConnecting, retry: retryWalletConnection)
                     .transition(.move(edge: .top).combined(with: .opacity))
             }
             
@@ -118,8 +128,21 @@ private struct WalletView: View {
         }
         .refreshable { await refresh() }
         .syncTransactionData(requestInProgress: $requestInProgress)
-        .task { await reachability.startMonitoring() }
+        .refreshConfigData()
+        .task { await monitorReachability() }
         .onAppear(perform: setBTCPrice)
+        .animation(DesignTokens.Animation.smooth, value: nwc.hasConnected)
+    }
+
+    /// The wallet state hears when the network comes back, which is when a connection
+    /// that failed at launch is worth trying again.
+    private func monitorReachability() async {
+        reachability.delegate = state
+        await reachability.startMonitoring()
+    }
+
+    private func retryWalletConnection() {
+        state.triggerDataSync()
     }
     
     private func setBTCPrice() {
@@ -171,6 +194,37 @@ private struct NetworkStatusBanner: View {
         .frame(maxWidth: .infinity)
         .padding(.vertical, DesignTokens.Spacing.sm)
         .background(DesignTokens.Colors.Semantic.error)
+    }
+}
+
+// MARK: - Wallet Unreachable Banner
+
+/// Says the balance and activity on screen are from the last time the wallet answered,
+/// and offers to try the connection again.
+private struct WalletUnreachableBanner: View {
+    let isConnecting: Bool
+    let retry: () -> Void
+
+    var body: some View {
+        Button(action: retry) {
+            HStack(spacing: DesignTokens.Spacing.sm) {
+                if isConnecting {
+                    ProgressView()
+                        .tint(.white)
+                    Text("Reconnecting to your wallet…")
+                } else {
+                    Image(systemName: "bolt.slash.fill")
+                    Text("Can't reach your wallet. Tap to try again.")
+                }
+            }
+            .font(DesignTokens.Typography.subheadline)
+            .foregroundStyle(.white)
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, DesignTokens.Spacing.sm)
+            .background(DesignTokens.Colors.Semantic.error)
+        }
+        .buttonStyle(.plain)
+        .allowsHitTesting(!isConnecting)
     }
 }
 
@@ -295,5 +349,6 @@ private struct RecentTransactionRow: View {
     WalletPresenter()
         .environment(state)
         .environment(state.walletState)
+        .environment(AuthManager())
         .environment(\.reachability, Reachability())
 }

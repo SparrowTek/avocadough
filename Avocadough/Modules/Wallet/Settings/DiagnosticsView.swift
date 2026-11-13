@@ -134,6 +134,7 @@ private extension DiagnosticEvent.Category {
         case .send: DesignTokens.Colors.Accent.primary
         case .wallet: DesignTokens.Colors.Accent.lightning
         case .url: DesignTokens.Colors.Accent.warning
+        case .identity: DesignTokens.Colors.Accent.success
         case .app: Color.ds.textSecondary
         }
     }

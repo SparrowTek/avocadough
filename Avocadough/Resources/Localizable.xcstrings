@@ -4,6 +4,15 @@
     "" : {
 
     },
+    "%@ has no Lightning address Avocadough can pay yet." : {
+
+    },
+    "%@ has not set up a payment address yet." : {
+
+    },
+    "%@ is not a handle Avocadough can look up." : {
+
+    },
     "%@ sats" : {
 
     },
@@ -17,16 +26,16 @@
         }
       }
     },
-    "••••••" : {
-
-    },
     "+%@" : {
 
     },
-    "≈ %@" : {
+    "A beautiful wallet for the\nLightning Network" : {
 
     },
-    "A beautiful wallet for the\nLightning Network" : {
+    "A sign-in service we operate (auth.sparrowtek.com, hosted on Railway) takes part in signing you in and refreshing your session, so that it can sign Avocadough’s requests with Avocadough’s client key. Your tokens pass through it. It has no database and never logs them. The one thing it keeps is the answer to a successful token refresh, in memory for up to ten minutes, so that the app can retry if the answer was lost on the way." : {
+
+    },
+    "AT Protocol identity" : {
 
     },
     "About" : {
@@ -44,6 +53,9 @@
     "Analytics" : {
 
     },
+    "Anyone can pay you at %@. The payment goes to your connected wallet's Lightning address." : {
+
+    },
     "Appearance" : {
 
     },
@@ -59,10 +71,28 @@
     "Avocadoguh is a free and open source application. Please consider sending some sats to help support ongoing development efforts." : {
 
     },
-    "avocadough" : {
+    "Avocadough" : {
 
     },
-    "Avocadough" : {
+    "Avocadough could not find %@. Check the spelling and try again." : {
+
+    },
+    "Avocadough could not find that account. Check the handle and your connection, then try again." : {
+
+    },
+    "Avocadough could not look up %@. Check your connection and try again." : {
+
+    },
+    "Avocadough could not look up %@. Please try again." : {
+
+    },
+    "Avocadough could not open the sign-in page. Please try again." : {
+
+    },
+    "Avocadough could not reach your account host to see what is published at %@. Check your connection and try again." : {
+
+    },
+    "Avocadough could not reach your account host. Check your connection and try again." : {
 
     },
     "Avocadough diagnostics" : {
@@ -83,6 +113,9 @@
     "Avocadough’s app may collect aggregate, anonymous statistics, such as the percentage of users who use particular features, to improve the app." : {
 
     },
+    "Back" : {
+
+    },
     "By using Avocadough and providing your information, you authorize us to collect, use, and store your information outside of the European Union." : {
 
     },
@@ -92,10 +125,25 @@
     "California Online Privacy Protection Act Compliance" : {
 
     },
+    "Can't reach your wallet" : {
+
+    },
+    "Can't reach your wallet. Tap to try again." : {
+
+    },
     "Cancel" : {
 
     },
     "Changes to this policy" : {
+
+    },
+    "Check your internet connection and that your wallet is online, then try again. Your wallet stays paired until you disconnect it." : {
+
+    },
+    "Checking published address…" : {
+
+    },
+    "Checking your session…" : {
 
     },
     "Children’s Online Privacy Protection Act Compliance" : {
@@ -108,9 +156,6 @@
 
     },
     "Clear the diagnostics log?" : {
-
-    },
-    "color scheme" : {
 
     },
     "Color Scheme" : {
@@ -143,19 +188,16 @@
     "Create Invoice" : {
 
     },
-    "dark" : {
-
-    },
     "Dark" : {
-
-    },
-    "dark mode tint" : {
 
     },
     "Diagnostics" : {
 
     },
     "Disconnect" : {
+
+    },
+    "Disconnect Wallet" : {
 
     },
     "Disconnect and Clear Data" : {
@@ -179,9 +221,6 @@
     "Error" : {
 
     },
-    "Failed to connect to your wallet" : {
-
-    },
     "Failed to connect wallet. Please check your connection string and try again." : {
 
     },
@@ -191,16 +230,19 @@
     "General" : {
 
     },
-    "Get one here" : {
-
-    },
     "Get Started" : {
 
     },
-    "go" : {
+    "Get one here" : {
 
     },
-    "If we decide to change our privacy policy, we will post those changes on this page. Summary of changes so far: June 3, 2025: First published." : {
+    "Get paid at your handle" : {
+
+    },
+    "Identity" : {
+
+    },
+    "If we decide to change our privacy policy, we will post those changes on this page. Summary of changes so far: June 3, 2025: First published. November 2026: Added AT Protocol identity, the sign-in service and handle lookups." : {
 
     },
     "If you have questions regarding this privacy policy, you may email contact@sparrowtek.com." : {
@@ -227,22 +269,19 @@
     "Invoice" : {
 
     },
-    "invoice, lightning address, or LNURL" : {
-
-    },
     "Invoices without an amount aren't supported yet." : {
-
-    },
-    "light" : {
 
     },
     "Light" : {
 
     },
-    "light mode tint" : {
+    "Loading..." : {
 
     },
-    "Loading..." : {
+    "Looking up" : {
+
+    },
+    "Looking up a handle" : {
 
     },
     "Max" : {
@@ -257,9 +296,6 @@
     "Newest first. The shared report includes scanned payloads and invoice text." : {
 
     },
-    "No diagnostics yet" : {
-
-    },
     "No Results" : {
 
     },
@@ -269,19 +305,19 @@
     "No Transactions Yet" : {
 
     },
-    "nostr+walletconnect://..." : {
+    "No diagnostics yet" : {
+
+    },
+    "Not published" : {
 
     },
     "OK" : {
 
     },
-    "On-chain bitcoin addresses aren't supported. Ask for a Lightning invoice instead." : {
-
-    },
-    "or paste connection string" : {
-
-    },
     "OR:" : {
+
+    },
+    "On-chain bitcoin addresses aren't supported. Ask for a Lightning invoice instead." : {
 
     },
     "Our server software may store basic technical information, such as your IP address, in temporary memory or logs." : {
@@ -293,13 +329,16 @@
     "Paste" : {
 
     },
-    "Payment failed. Please check your wallet and try again." : {
-
-    },
     "Payment Received!" : {
 
     },
     "Payment Sent!" : {
+
+    },
+    "Payment address" : {
+
+    },
+    "Payment failed. Please check your wallet and try again." : {
 
     },
     "Pending" : {
@@ -320,40 +359,43 @@
     "Privacy Policy" : {
 
     },
-    "Receive" : {
+    "Publish %@" : {
 
     },
-    "received" : {
+    "Published" : {
+
+    },
+    "Publishing writes a public record to your AT Protocol account that links %@ to this Lightning address, so anyone can pay you at your handle." : {
+
+    },
+    "Receive" : {
 
     },
     "Recent Activity" : {
 
     },
-    "Request a specific amount" : {
+    "Reconnecting to your wallet…" : {
 
     },
     "Request Payment" : {
 
     },
-    "reset theme" : {
+    "Request a specific amount" : {
+
+    },
+    "Retry" : {
 
     },
     "Review Payment" : {
 
     },
-    "sats" : {
-
-    },
     "Scan" : {
 
     },
-    "Scan a QR code or open a lightning: link and every step shows up here." : {
-
-    },
-    "scan QR" : {
-
-    },
     "Scan QR Code" : {
+
+    },
+    "Scan a QR code or open a lightning: link and every step shows up here." : {
 
     },
     "Scan the NWC QR code from your\nwallet provider to get started" : {
@@ -365,25 +407,46 @@
     "See more" : {
 
     },
-    "selected color scheme" : {
-
-    },
     "Send" : {
 
     },
-    "send BTC" : {
-
-    },
     "Sending to" : {
-
-    },
-    "sent" : {
 
     },
     "Sent!" : {
 
     },
     "Settings" : {
+
+    },
+    "Sign in" : {
+
+    },
+    "Sign in with an AT Protocol identity, like your Bluesky account, to let people pay you at your handle. You sign in on your account host's own page, and Avocadough only asks for permission to manage its payment address record." : {
+
+    },
+    "Sign in with your handle" : {
+
+    },
+    "Sign out" : {
+
+    },
+    "Sign-in service" : {
+
+    },
+    "Sign-in was cancelled" : {
+
+    },
+    "Signed in as" : {
+
+    },
+    "Signing in with an AT Protocol identity, such as a Bluesky account, is optional. You sign in on your account host’s own page, so Avocadough never sees your password. Signing in gives the app access tokens, which it keeps in the device Keychain, and the only permission it asks for is to manage its own payment address record in your account.\n\nIf you publish a payment address, Avocadough writes a public record to your AT Protocol account that links your handle to your wallet’s Lightning address. Anyone can read that record. It stays in place until you unpublish it in the app, including after you sign out or delete the app." : {
+
+    },
+    "Signing in…" : {
+
+    },
+    "Signing out leaves your published payment address in place. Unpublish it first if you no longer want to be paid at your handle." : {
 
     },
     "Slide to Send" : {
@@ -395,16 +458,10 @@
     "Support" : {
 
     },
-    "support avocadough" : {
-
-    },
     "Support Avocadough" : {
 
     },
     "Syncing" : {
-
-    },
-    "system" : {
 
     },
     "System" : {
@@ -431,22 +488,46 @@
     "The current NWC wallet connection does not have permission to send sats" : {
 
     },
+    "The published address could not be checked" : {
+
+    },
+    "The server returned an invalid PDS endpoint: %@" : {
+
+    },
+    "The server returned an invalid account identifier: %@" : {
+
+    },
+    "The server returned an invalid handle: %@" : {
+
+    },
     "Third-party links and content" : {
 
     },
     "This policy applies to all information collected or submitted on Avocadough’s website and our apps for iPhone and any other devices and platforms." : {
 
     },
-    "This will remove your wallet connection and all local data." : {
+    "This will remove your wallet connection and all local data, and sign you out of your AT Protocol identity. Your published payment address stays in place." : {
 
     },
-    "to" : {
+    "This will remove your wallet connection and all local data." : {
 
     },
     "Transaction" : {
 
     },
+    "Try Again" : {
+
+    },
     "Try a different search term" : {
+
+    },
+    "Try again" : {
+
+    },
+    "Unpublish payment address" : {
+
+    },
+    "Update to %@" : {
 
     },
     "Use your camera to scan" : {
@@ -467,16 +548,109 @@
     "We use the information we collect to operate and improve our website, apps, and customer support.\n\nWe do not share personal information with outside parties except to the extent necessary to accomplish Avocadough’s functionality.\nWe may disclose your information in response to subpoenas, court orders, or other legal requirements; to exercise our legal rights or defend against legal claims; to investigate, prevent, or take action regarding illegal activities, suspected fraud or abuse, violations of our policies; or to protect our rights and property.\n\nIn the future, we may sell to, buy, merge with, or partner with other businesses. In such transactions, user information may be among the transferred assets." : {
 
     },
+    "When you pay someone at their handle, or sign in with yours, Avocadough looks the handle up. That contacts the handle’s own domain, a public DNS resolver (Cloudflare), the PLC directory (plc.directory) and the account’s host. Each of them sees your IP address and the handle or account being looked up, as any server you connect to does." : {
+
+    },
+    "You declined access" : {
+
+    },
     "Your Bitcoin,\nYour Control." : {
 
     },
     "Your Consent" : {
 
     },
+    "Your account host did not accept the change. Try again, or sign out and sign in again." : {
+
+    },
+    "Your account host did not complete the sign-in: %@" : {
+
+    },
+    "Your account host signed you in without permission to manage the payment address record, so Avocadough can't change it for this account." : {
+
+    },
+    "Your connected wallet has no Lightning address, so there is nothing to publish. Connect a wallet that provides one to be payable at your handle." : {
+
+    },
     "Your recent transactions will appear here" : {
 
     },
+    "Your session expired. Please sign in again." : {
+
+    },
     "Your transaction history will appear here" : {
+
+    },
+    "avocadough" : {
+
+    },
+    "color scheme" : {
+
+    },
+    "dark" : {
+
+    },
+    "dark mode tint" : {
+
+    },
+    "go" : {
+
+    },
+    "invoice, lightning address, LNURL, or @handle" : {
+
+    },
+    "light" : {
+
+    },
+    "light mode tint" : {
+
+    },
+    "nostr+walletconnect://..." : {
+
+    },
+    "or paste connection string" : {
+
+    },
+    "received" : {
+
+    },
+    "reset theme" : {
+
+    },
+    "sats" : {
+
+    },
+    "scan QR" : {
+
+    },
+    "selected color scheme" : {
+
+    },
+    "send BTC" : {
+
+    },
+    "sent" : {
+
+    },
+    "support avocadough" : {
+
+    },
+    "system" : {
+
+    },
+    "to" : {
+
+    },
+    "you.bsky.social" : {
+
+    },
+    "your handle" : {
+
+    },
+    "••••••" : {
+
+    },
+    "≈ %@" : {
 
     }
   },

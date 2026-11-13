@@ -17,6 +17,9 @@ struct DiagnosticEvent: Codable, Identifiable, Hashable, Sendable {
         case wallet
         /// `lightning:` and `bitcoin:` URLs another app handed over.
         case url
+        /// AT Protocol identity: looking a handle up, signing in, and publishing the
+        /// payment address. Never carries tokens or keys.
+        case identity
         /// Launch and other lifecycle context.
         case app
     }

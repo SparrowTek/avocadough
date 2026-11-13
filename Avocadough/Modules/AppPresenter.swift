@@ -45,5 +45,6 @@ struct AppPresenter: View {
         .setupModel()
         .environment(\.nwc, NWC())
         .environment(AppState())
+        .environment(AuthManager())
         .environment(ScanQRCodeState(parentState: SetupState(parentState: .init())))
 }

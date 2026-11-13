@@ -11,11 +11,36 @@ import CoreNostr
 import Vault
 
 enum NWCError: Error {
+    /// The keychain holds no pairing secret, so this device isn't paired with a wallet.
     case noSecret
+    /// The keychain couldn't be read just now, for example while the device is locked.
+    /// It says nothing about whether a pairing exists.
+    case secretUnavailable
     case failedToSaveSecret
     case notConnected
     case failedToParse
     case nostrKit(Error)
+}
+
+extension NWCError {
+    /// Classifies a failure to read the pairing secret: only "no such item" means there
+    /// is no secret. Anything else is the keychain being unavailable.
+    init(readingSecret error: any Error) {
+        self = (error as? VaultError) == .itemNotFound ? .noSecret : .secretUnavailable
+    }
+
+    /// Whether the failure proves the stored pairing can never connect, which is the only
+    /// reason to remove it without being asked. An unreachable relay, a wallet that
+    /// doesn't answer, and a locked keychain all clear up by themselves, and a deleted
+    /// pairing can only be replaced by a new code from the wallet.
+    var invalidatesPairing: Bool {
+        switch self {
+        case .noSecret:
+            true
+        case .secretUnavailable, .failedToSaveSecret, .notConnected, .failedToParse, .nostrKit:
+            false
+        }
+    }
 }
 
 /// Custom response type to maintain API compatibility with existing code.
@@ -33,6 +58,8 @@ class NWC {
     private let diagnostics: DiagnosticsLog
     private var storedUri: String?
     var hasConnected = false
+    /// Whether a connection attempt is in flight.
+    private(set) var isConnecting = false
 
     init(diagnostics: DiagnosticsLog = .shared) {
         self.diagnostics = diagnostics
@@ -86,17 +113,25 @@ class NWC {
     }
 
     /// Initialize and connect the NWC client
+    ///
+    /// Safe to call again after a failure: it is how a connection that couldn't be made
+    /// at launch is retried once the network is back.
     /// - Parameters:
     ///   - pubKey: The wallet's public key (hex string)
     ///   - relay: The relay URL
     ///   - lud16: Optional lightning address
+    /// - Throws: `NWCError.noSecret` when the keychain holds no pairing secret. Every other
+    ///   error leaves the pairing usable; see `NWCError.invalidatesPairing`.
     func initializeNWCClient(pubKey: String, relay: String, lud16: String?) async throws(NWCError) {
         // Prevent multiple connections
         guard !hasConnected else { return }
-        guard let secret = await storedSecret() else { throw .noSecret }
+        let secret = try await storedSecret()
 
         // Reconstruct URI from components if we don't have it stored
         let uri = storedUri ?? buildUri(pubKey: pubKey, relay: relay, secret: secret, lud16: lud16)
+
+        isConnecting = true
+        defer { isConnecting = false }
 
         do {
             try await walletManager.connect(uri: uri)
@@ -114,6 +149,7 @@ class NWC {
         do {
             return try await walletManager.getInfo()
         } catch {
+            diagnostics.record(.wallet, "get_info failed", detail: String(describing: error))
             throw .nostrKit(error)
         }
     }
@@ -125,6 +161,7 @@ class NWC {
             let balance = try await walletManager.getBalance()
             return UInt64(max(0, balance))
         } catch {
+            diagnostics.record(.wallet, "get_balance failed", detail: String(describing: error))
             throw .nostrKit(error)
         }
     }
@@ -224,8 +261,14 @@ class NWC {
 
     // MARK: - Secret Management
 
-    private func storedSecret() async -> String? {
-        try? await Vault.shared.read(configuration: .nwcSecret)
+    private func storedSecret() async throws(NWCError) -> String {
+        do {
+            return try await Vault.shared.read(configuration: .nwcSecret)
+        } catch {
+            let failure = NWCError(readingSecret: error)
+            diagnostics.record(.wallet, "Couldn't read the wallet secret from the keychain", detail: String(describing: error))
+            throw failure
+        }
     }
 
     private func saveSecret(_ secret: String) async throws(NWCError) {

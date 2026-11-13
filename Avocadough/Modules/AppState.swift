@@ -20,7 +20,17 @@ public class AppState {
         var id: Int { rawValue }
     }
     
+    /// What the launch screen shows while `route` is `.config`.
+    enum ConfigStatus {
+        /// Connecting to the paired wallet.
+        case connecting
+        /// The wallet couldn't be reached and nothing is cached to show in its place.
+        case unreachable
+    }
+
     var route: Route = .setup
+    var configStatus: ConfigStatus = .connecting
+    var presentDisconnectDialog = false
     var triggerDataSync = false
     var triggerLogout = false
 
@@ -70,16 +80,59 @@ public class AppState {
         walletState.send(input)
     }
     
+    /// Only a keychain that holds no secret means there is nothing to connect to. A
+    /// keychain that can't be read goes to the launch screen like a pairing does, which
+    /// keeps whatever is stored if it can't connect.
     func determineRoute() async {
-        if (try? await Vault.shared.read(configuration: .nwcSecret)) != nil {
+        do {
+            _ = try await Vault.shared.read(configuration: .nwcSecret)
             route = .config
-        } else {
-            route = .setup
+        } catch {
+            let failure = NWCError(readingSecret: error)
+            if !failure.invalidatesPairing {
+                diagnostics.record(.app, "Couldn't read the keychain at launch", detail: String(describing: error))
+            }
+            route = failure.invalidatesPairing ? .setup : .config
         }
     }
     
     func walletSuccessfullyConnected() {
+        configStatus = .connecting
         route = .config
+    }
+
+    /// The paired wallet couldn't be reached. The pairing is kept either way, because
+    /// only the wallet can issue a new one: with a wallet cached from an earlier launch
+    /// the app opens on it and catches up once the connection is back, and without one
+    /// the launch screen offers to try again.
+    ///
+    /// Has no effect once the wallet is showing, where a failed refresh changes nothing.
+    func walletUnreachable(hasCachedWallet: Bool) {
+        guard route == .config else { return }
+
+        if hasCachedWallet {
+            diagnostics.record(.wallet, "Couldn't reach the wallet; showing the cached one until the connection is back")
+            configSuccessful()
+        } else {
+            diagnostics.record(.wallet, "Couldn't reach the wallet and nothing is cached; the pairing is kept")
+            configStatus = .unreachable
+        }
+    }
+
+    /// Asks for the wallet connection to be tried again.
+    func retryWalletConnection() {
+        if route == .config {
+            configStatus = .connecting
+        }
+        triggerDataSync = true
+    }
+
+    /// The connection came back while the wallet was already showing cached data, so
+    /// the transactions that couldn't load are fetched now.
+    func walletReconnected() {
+        guard route == .wallet else { return }
+        diagnostics.record(.wallet, "Reconnected to the wallet; catching up")
+        walletState.triggerTransactionSync = true
     }
     
     func configSuccessful() {
@@ -103,6 +156,9 @@ public class AppState {
     /// `LogoutTracker`, which observes `triggerLogout`.
     func logout(error: LocalizedStringKey? = nil) {
         triggerLogout.toggle()
+        triggerDataSync = false
+        configStatus = .connecting
+        presentDisconnectDialog = false
         pendingPaymentInput = nil
         setupState.errorMessage = error
         route = .setup

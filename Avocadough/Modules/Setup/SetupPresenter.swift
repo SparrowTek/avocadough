@@ -315,17 +315,19 @@ private struct ConnectWalletView: View {
             }
 
             // Help link
-            Link(destination: URL(string: "https://nwc.dev")!) {
-                HStack(spacing: DesignTokens.Spacing.xs) {
-                    Text("Need a wallet?")
-                        .foregroundStyle(Color.ds.textTertiary)
-                    Text("Get one here")
-                        .foregroundStyle(DesignTokens.Colors.Accent.primary)
-                    Image(systemName: "arrow.up.right")
-                        .font(.system(size: 12))
-                        .foregroundStyle(DesignTokens.Colors.Accent.primary)
+            if let walletGuide = URL(string: "https://nwc.dev") {
+                Link(destination: walletGuide) {
+                    HStack(spacing: DesignTokens.Spacing.xs) {
+                        Text("Need a wallet?")
+                            .foregroundStyle(Color.ds.textTertiary)
+                        Text("Get one here")
+                            .foregroundStyle(DesignTokens.Colors.Accent.primary)
+                        Image(systemName: "arrow.up.right")
+                            .font(.system(size: 12))
+                            .foregroundStyle(DesignTokens.Colors.Accent.primary)
+                    }
+                    .font(DesignTokens.Typography.subheadline)
                 }
-                .font(DesignTokens.Typography.subheadline)
             }
         }
         .opacity(hasAppeared ? 1 : 0)
@@ -379,6 +381,9 @@ private struct ConnectWalletView: View {
     private func parseWalletCode(_ code: String) async {
         do {
             let nwcCode = try await nwc.parseWalletCode(code)
+            // One pairing at a time. A code from an attempt that never connected stays
+            // stored, and launch would otherwise pick between it and this one.
+            nwcCodes.forEach { context.delete($0) }
             context.insert(nwcCode)
             try context.save()
 

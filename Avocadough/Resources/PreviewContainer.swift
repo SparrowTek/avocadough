@@ -52,7 +52,7 @@ struct SampleDataWallet: PreviewModifier {
 
 struct SampleCompositeData: PreviewModifier {
     static func makeSharedContext() async throws -> ModelContainer {
-        let container = try ModelContainer(for: Transaction.self, Wallet.self, configurations: ModelConfiguration(isStoredInMemoryOnly: true))
+        let container = try ModelContainer(for: Transaction.self, Wallet.self, NWCConnection.self, configurations: ModelConfiguration(isStoredInMemoryOnly: true))
 
         let transaction1 = Transaction(transactionType: .incoming, invoice: "lnbc2500u1pne092fdqqnp4qt6nmjr96e7ctnh2t2v55yaxcrl7pw447pj4838ktkdxhvl5mmr9qpp572k5dv9mv2ykz53wcfk8w256ffgm9e3nvp7t2z35r3rus9gqgvessp5vrxy6tm24qrk3f6c3pgve648xxtdycz908s07lqrz04663z56r7q9qyysgqcqpcxqyz5vqrzjqw9fu4j39mycmg440ztkraa03u5qhtuc5zfgydsv6ml38qd4azymlapyqqqqqqqfnvqqqqlgqqqq86qqjqxkn27rj0qxr03p33ls4j7ze6cc6l9tk0438jquf8f6zx5058ukdksljcprvamtxa22rfvpdsr77n3qmucsgnjs9zcq0dg9w32jcjrccp934797", transactionDescription: "", descriptionHash: "", preimage: "407ae08f820cdc81b54deebde412f7abe36dee72747644236a646d3743d1c21e", paymentHash: "f2ad46b0bb628961522ec26c772a9a4a51b2e633607cb50a341c47c815004333", amount: 250000000, feesPaid: 0, createdAt: 1737987401, expiresAt: 1738073801, settledAt: 1737987436)
 
@@ -67,6 +67,33 @@ struct SampleCompositeData: PreviewModifier {
         let wallet = Wallet(balance: 234553, alias: "My Wallet", blockHash: "ereijr03r4i8", blockHeight: 3452234, color: "0x34534", methods: [.getBalance, .listTransactions], network: "wowow", pubkey: "efjngfdg492")
         container.mainContext.insert(wallet)
 
+        let connection = NWCConnection(
+            pubKey: "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+            relay: "wss://relay.getalby.com/v1",
+            lud16: "sparrowtek@getalby.com"
+        )
+        container.mainContext.insert(connection)
+
+        try container.mainContext.save()
+        return container
+    }
+
+    func body(content: Content, context: ModelContainer) -> some View {
+        content.modelContainer(context)
+    }
+}
+
+/// A paired wallet that has a Lightning address, for screens that offer to publish it.
+struct SampleDataWalletConnection: PreviewModifier {
+    static func makeSharedContext() async throws -> ModelContainer {
+        let container = try ModelContainer(for: NWCConnection.self, configurations: ModelConfiguration(isStoredInMemoryOnly: true))
+        let connection = NWCConnection(
+            pubKey: "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+            relay: "wss://relay.getalby.com/v1",
+            lud16: "sparrowtek@getalby.com"
+        )
+        container.mainContext.insert(connection)
+
         try container.mainContext.save()
         return container
     }
@@ -80,6 +107,7 @@ extension PreviewTrait where T == Preview.ViewTraits {
     @MainActor static var sampleTransactions: Self = .modifier(SampleDataTransactions())
     @MainActor static var sampleWallet: Self = .modifier(SampleDataWallet())
     @MainActor static var sampleComposite: Self = .modifier(SampleCompositeData())
+    @MainActor static var sampleWalletConnection: Self = .modifier(SampleDataWalletConnection())
 }
 
 fileprivate func object<c: Codable>(resourceName: String) -> c? {

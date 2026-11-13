@@ -8,6 +8,7 @@ import AvocadoughKit
 
 struct ResolveIdentityView: View {
     @Environment(SendState.self) private var state
+    @Environment(\.diagnostics) private var diagnostics
     var identifier: String
     @State private var resolutionErrorMessage: String?
     @State private var resolutionAttempt = 0
@@ -84,20 +85,24 @@ struct ResolveIdentityView: View {
     }
 
     private func resolve() async {
+        diagnostics.record(.identity, "Looking up the payment address behind an identity", detail: identifier)
+
         do {
             let resolved = try await PaymentTargetResolver().resolve(.atIdentifier(identifier))
 
             guard let lightningAddress = resolved.preferredLightningAddress else {
-                resolutionErrorMessage = "\(displayIdentifier) has not published a Lightning address."
+                diagnostics.record(.identity, "The identity publishes no Lightning address")
+                resolutionErrorMessage = IdentityFailure.noLightningAddressMessage(identifier: displayIdentifier)
                 return
             }
 
+            diagnostics.record(.identity, "The identity resolved to a Lightning address", detail: lightningAddress)
             state.identityResolved(resolved.identity, lightningAddress: lightningAddress)
-        } catch is CancellationError {
-            return
         } catch {
+            // Leaving the screen cancels the lookup, which is not a failure to report.
             guard !Task.isCancelled else { return }
-            resolutionErrorMessage = error.localizedDescription
+            diagnostics.record(.identity, "The identity lookup failed", detail: IdentityFailure.diagnosticDetail(for: error))
+            resolutionErrorMessage = IdentityFailure.lookupMessage(for: error, identifier: displayIdentifier)
         }
     }
 }

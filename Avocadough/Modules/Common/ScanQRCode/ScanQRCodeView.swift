@@ -177,6 +177,11 @@ fileprivate struct QrCodeScannerView: UIViewRepresentable {
         } else {
             diagnostics.record(.scan, "The metadata output couldn't be added, so no QR code can be detected")
         }
+
+        // Last, once the session has settled on the camera's format: the format sets the
+        // field of view and the zoom range, and changing it resets the zoom.
+        zoomForSmallCodes(backCamera, diagnostics: diagnostics)
+
         let previewLayer = AVCaptureVideoPreviewLayer(session: session)
         
         uiView.backgroundColor = UIColor.gray
@@ -186,6 +191,31 @@ fileprivate struct QrCodeScannerView: UIViewRepresentable {
         
         Task.detached {
             session.startRunning()
+        }
+    }
+
+    /// Zooms `camera` in far enough for a small code to fill a useful part of the picture
+    /// from a distance its lens can still focus at. See ``ScannerZoom``.
+    private func zoomForSmallCodes(_ camera: AVCaptureDevice, diagnostics: DiagnosticsLog) {
+        let lowest = Double(camera.minAvailableVideoZoomFactor)
+        let highest = max(lowest, Double(camera.maxAvailableVideoZoomFactor))
+        let factor = ScannerZoom.factor(
+            minimumFocusDistance: camera.minimumFocusDistance,
+            fieldOfView: Double(camera.activeFormat.videoFieldOfView),
+            availableFactors: lowest...highest
+        )
+
+        do {
+            try camera.lockForConfiguration()
+            camera.videoZoomFactor = CGFloat(factor)
+            camera.unlockForConfiguration()
+            diagnostics.record(
+                .scan,
+                "Camera zoom set for small codes",
+                detail: "\(factor.formatted(.number.precision(.fractionLength(0...2))))x · field of view: \(camera.activeFormat.videoFieldOfView.formatted(.number.precision(.fractionLength(0...1))))°"
+            )
+        } catch {
+            diagnostics.record(.scan, "The camera couldn't be zoomed for small codes", detail: String(describing: error))
         }
     }
 

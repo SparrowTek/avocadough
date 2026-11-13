@@ -71,13 +71,19 @@ struct TaskTriggerViewModifier<Value: Equatable>: ViewModifier where Value: Send
                 // check that the trigger's state is indeed active and obtain the value.
                 guard case let .active(value, _) = trigger.state else { return }
 
+                // the id being served; a later trigger() replaces it.
+                let served = trigger.taskId
+
                 // execute the async work.
                 await action(value)
 
-                // if not already cancelled, reset the trigger.
+                // reset the trigger unless it has fired again in the meantime.
+                // Do not test Task.isCancelled here: SwiftUI cancels this task when
+                // the action removes or covers the view hosting it, and a trigger
+                // left armed would run the action again when that view reappears.
                 // Use MainActor to ensure state updates happen on main thread
-                if !Task.isCancelled {
-                    await MainActor.run {
+                await MainActor.run {
+                    if self.trigger.taskId == served {
                         self.trigger.cancel()
                     }
                 }

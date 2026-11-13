@@ -28,18 +28,23 @@ class Reachability {
     func startMonitoring() async {
         let monitor = NWPathMonitor()
         for await path in monitor.paths() {
-            evaluatePath(path)
+            pathChanged(isSatisfied: path.status == .satisfied)
         }
     }
-    
-    private func evaluatePath(_ path: NWPath) {
+
+    /// Records the latest path and asks for a data sync when the network comes back.
+    ///
+    /// The monitor also reports every interface change and the path it starts on, so a
+    /// sync is only worth asking for after the network had actually been lost.
+    func pathChanged(isSatisfied: Bool) {
+        let recovered = isSatisfied && connectionState != .good
+
         withAnimation(.easeInOut(duration: 1.0)) {
-            if path.status == .satisfied {
-                connectionState = .good
-                delegate?.triggerDataSync()
-            } else {
-                connectionState = .notReachable
-            }
+            connectionState = isSatisfied ? .good : .notReachable
+        }
+
+        if recovered {
+            delegate?.triggerDataSync()
         }
     }
 }
