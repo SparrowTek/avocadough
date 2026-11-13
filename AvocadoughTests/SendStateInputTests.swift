@@ -5,6 +5,7 @@
 
 import Testing
 import Foundation
+import AvocadoughKit
 @testable import Avocadough
 
 @MainActor
@@ -114,5 +115,75 @@ struct SendStateInputTests {
         state.foundQRCode("alice@getalby.com")
 
         #expect(state.diagnostics.events.last?.summary == "Replaced the top screen with the lightning address screen")
+    }
+
+    // MARK: - AT Protocol identities
+
+    @Test(
+        "AT Protocol identifiers go to the identity lookup",
+        arguments: [
+            ("@alice.bsky.social", "alice.bsky.social"),
+            ("alice.bsky.social", "alice.bsky.social"),
+            ("  @alice.bsky.social\n", "alice.bsky.social"),
+            ("lightning:@alice.bsky.social", "alice.bsky.social"),
+            ("did:plc:ewvi7nxzyoun6zhxrhs64oiz", "did:plc:ewvi7nxzyoun6zhxrhs64oiz"),
+        ]
+    )
+    func atIdentifierIsResolved(input: String, identifier: String) {
+        let state = makeState()
+        state.continueWithInput(input)
+
+        #expect(state.path == [.resolveIdentity(identifier)])
+        #expect(state.errorMessage == nil)
+    }
+
+    @Test("A scanned handle replaces the scanner with the identity lookup")
+    func scannedHandleReplacesScanner() {
+        let state = makeState()
+        state.path = [.scanQR]
+        state.foundQRCode("@alice.bsky.social")
+
+        #expect(state.path == [.resolveIdentity("alice.bsky.social")])
+        #expect(state.diagnostics.events.last?.summary == "Replaced the top screen with the identity lookup screen")
+    }
+
+    @Test("A resolved identity swaps the lookup for the Lightning address flow")
+    func identityResolvedSwapsLookup() {
+        let state = makeState()
+        state.continueWithInput("@alice.bsky.social")
+
+        let identity = PaymentIdentity(did: "did:plc:alice", handle: "alice.bsky.social", pdsEndpoint: "https://pds.example.com")
+        state.identityResolved(identity, lightningAddress: "alice@getalby.com")
+
+        #expect(state.path == [.getLightningAddressDetails("alice@getalby.com")])
+        #expect(state.resolvedIdentity == identity)
+    }
+
+    @Test("A resolution that lands after the user backed out is ignored")
+    func lateIdentityResolutionIsIgnored() {
+        let state = makeState()
+        state.continueWithInput("@alice.bsky.social")
+        state.path.removeAll()
+
+        let identity = PaymentIdentity(did: "did:plc:alice", handle: "alice.bsky.social", pdsEndpoint: "https://pds.example.com")
+        state.identityResolved(identity, lightningAddress: "alice@getalby.com")
+
+        #expect(state.path.isEmpty)
+        #expect(state.resolvedIdentity == nil)
+    }
+
+    @Test("New input clears the identity from an earlier lookup")
+    func newInputClearsResolvedIdentity() {
+        let state = makeState()
+        state.continueWithInput("@alice.bsky.social")
+        state.identityResolved(
+            PaymentIdentity(did: "did:plc:alice", handle: "alice.bsky.social", pdsEndpoint: "https://pds.example.com"),
+            lightningAddress: "alice@getalby.com"
+        )
+
+        state.start(with: "bob@getalby.com")
+
+        #expect(state.resolvedIdentity == nil)
+        #expect(state.path == [.getLightningAddressDetails("bob@getalby.com")])
     }
 }
